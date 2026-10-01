@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="theme-color" content="#f7f7f6" />
+    <link rel="icon" href="./icone.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="./icone-192.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>charges-climatiques — neige et vent, EN 1991-1-3 et EN 1991-1-4</title>
+  </head>
+  <body>
+    <nav class="barre" aria-label="suite d'outils">
+      <div class="barre-corps">
+        <span class="barre-nom">Aedificium &middot; Actions</span>
+        <a class="barre-lien" href="https://henri421.github.io/WebAedificium/" target="_blank" rel="noopener"
+          >Suite Aedificium &#8599;</a
+        >
+      </div>
+    </nav>
+
+    <header>
+      <h1>charges-climatiques</h1>
+      <p class="sous-titre">
+        Charges de neige (EN 1991-1-3) et actions du vent (EN 1991-1-4) sur un batiment a base rectangulaire,
+        rendues zone par zone et cas par cas.
+      </p>
+      <p class="avertissement">
+        Aide au calcul : l'outil constate, il ne prescrit pas. Les actions climatiques dependent de l'annexe
+        nationale en vigueur au lieu de construction ; le profil actif et la date de ses donnees sont affiches en
+        permanence, et il appartient a l'utilisateur de verifier qu'ils correspondent au texte applicable a son
+        projet. v<sub>b,0</sub> et s<sub>k</sub> se saisissent toujours.
+      </p>
+    </header>
+
+    <main>
+      <section id="profil" aria-label="profil normatif actif">
+        <h2>Profil normatif actif</h2>
+        <div data-role="profil-corps"></div>
+        <div data-role="origines-corps"></div>
+      </section>
+
+      <section id="saisie" aria-label="saisie du batiment et du site">
+        <form id="formulaire" autocomplete="off">
+          <fieldset>
+            <legend>Batiment</legend>
+            <label><span>Longueur, le long de x (m)</span><input type="text" inputmode="decimal" data-champ="longueur" /></label>
+            <label><span>Largeur, le long de y (m)</span><input type="text" inputmode="decimal" data-champ="largeur" /></label>
+            <label><span>Hauteur h (m)</span><input type="text" inputmode="decimal" data-champ="hauteur" /></label>
+            <label><span>Toiture</span>
+              <select data-champ="toiture">
+                <option value="plate">plate</option>
+                <option value="un-versant">un versant</option>
+                <option value="deux-versants">deux versants, faitage selon x</option>
+              </select>
+            </label>
+            <div class="groupe" data-groupe="plate">
+              <label><span>Acrotere h<sub>p</sub> (m)</span><input type="text" inputmode="decimal" data-champ="acrotere" /></label>
+            </div>
+            <div class="groupe" data-groupe="un-versant">
+              <label><span>Pente &alpha;, descendant vers y- (&deg;)</span><input type="text" inputmode="decimal" data-champ="pente" /></label>
+            </div>
+            <div class="groupe" data-groupe="deux-versants">
+              <label><span>Pente du versant y- (&deg;)</span><input type="text" inputmode="decimal" data-champ="pente1" /></label>
+              <label><span>Pente du versant y+ (&deg;)</span><input type="text" inputmode="decimal" data-champ="pente2" /></label>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Vent &middot; site</legend>
+            <label><span>v<sub>b,0</sub> (m/s), carte nationale</span><input type="text" inputmode="decimal" data-champ="v_b0" placeholder="a saisir" /></label>
+            <label><span>Categorie de terrain</span>
+              <select data-champ="categorie">
+                <option value="0">0 &middot; mer, zone cotiere</option>
+                <option value="I">I &middot; lacs, sans obstacle</option>
+                <option value="II">II &middot; vegetation basse, obstacles isoles</option>
+                <option value="III">III &middot; village, banlieue, foret</option>
+                <option value="IV">IV &middot; ville, 15 % bati &gt; 15 m</option>
+              </select>
+            </label>
+            <label><span>Orographie</span>
+              <select data-champ="oro_mode">
+                <option value="negligeable">negligeable (c_o = 1)</option>
+                <option value="saisi">c_o saisi</option>
+              </select>
+            </label>
+            <div class="groupe" data-groupe="oro">
+              <label><span>c<sub>o</sub> (-), annexe A.3</span><input type="text" inputmode="decimal" data-champ="c_o" /></label>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Vent &middot; batiment</legend>
+            <label><span>Pression interieure</span>
+              <select data-champ="pi_mode">
+                <option value="enveloppe">enveloppe +0,2 / -0,3</option>
+                <option value="face-dominante">face dominante</option>
+              </select>
+            </label>
+            <div class="groupe" data-groupe="face-dominante">
+              <label><span>Face dominante</span>
+                <select data-champ="pi_face">
+                  <option value="y-">long pan y-</option>
+                  <option value="y+">long pan y+</option>
+                  <option value="x-">pignon x-</option>
+                  <option value="x+">pignon x+</option>
+                </select>
+              </label>
+              <label><span>Rapport des aires d'ouvertures (-)</span><input type="text" inputmode="decimal" data-champ="pi_rapport" /></label>
+              <label><span>Abscisse des ouvertures (m)</span><input type="text" inputmode="decimal" data-champ="pi_abscisse" /></label>
+            </div>
+            <label><span>c<sub>s</sub>c<sub>d</sub></span>
+              <select data-champ="cs_mode">
+                <option value="dispense">dispense du §6.2(1)</option>
+                <option value="saisi">valeur saisie</option>
+              </select>
+            </label>
+            <div class="groupe" data-groupe="cs-dispense">
+              <label class="case"><input type="checkbox" data-champ="cs_ossature" /><span>ossature avec murs de contreventement</span></label>
+            </div>
+            <div class="groupe" data-groupe="cs-saisi">
+              <label><span>c<sub>s</sub>c<sub>d</sub> (-)</span><input type="text" inputmode="decimal" data-champ="cs_valeur" /></label>
+            </div>
+            <label><span>Surfaces paralleles au vent</span>
+              <select data-champ="rugosite">
+                <option value="lisse">lisses (c_fr = 0,01)</option>
+                <option value="rugueuse">rugueuses (0,02)</option>
+                <option value="tres-rugueuse">tres rugueuses (0,04)</option>
+              </select>
+            </label>
+            <label><span>Aire chargee pour c<sub>pe</sub></span>
+              <select data-champ="aire_mode">
+                <option value="zone">aire de chaque zone</option>
+                <option value="saisie">aire saisie (element)</option>
+              </select>
+            </label>
+            <div class="groupe" data-groupe="aire">
+              <label><span>Aire chargee A (m&sup2;)</span><input type="text" inputmode="decimal" data-champ="aire" /></label>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Neige</legend>
+            <label><span>s<sub>k</sub> (kN/m&sup2;), carte nationale, altitude comprise</span><input type="text" inputmode="decimal" data-champ="s_k" placeholder="a saisir" /></label>
+            <label><span>Altitude du site (m)</span><input type="text" inputmode="decimal" data-champ="altitude" /></label>
+            <label><span>Topographie</span>
+              <select data-champ="topographie">
+                <option value="battue-par-les-vents">battue par les vents</option>
+                <option value="normale">normale</option>
+                <option value="abritee">abritee</option>
+              </select>
+            </label>
+            <label class="case"><input type="checkbox" data-champ="ct_saisi" /><span>imposer C<sub>t</sub> (toiture deperditive)</span></label>
+            <div class="groupe" data-groupe="ct">
+              <label><span>C<sub>t</sub> (-)</span><input type="text" inputmode="decimal" data-champ="C_t" /></label>
+            </div>
+            <label class="case"><input type="checkbox" data-champ="arret" /><span>arret de neige ou acrotere en rive basse</span></label>
+            <label class="case"><input type="checkbox" data-champ="debord" /><span>neige en debord de rive (§6.3)</span></label>
+          </fieldset>
+
+          <fieldset>
+            <legend>Neige &middot; accumulations</legend>
+            <label class="case"><input type="checkbox" data-champ="obstacle" /><span>obstacle en toiture (§6.2)</span></label>
+            <div class="groupe" data-groupe="obstacle">
+              <label><span>Nom</span><input type="text" data-champ="obs_nom" /></label>
+              <label><span>Hauteur (m)</span><input type="text" inputmode="decimal" data-champ="obs_hauteur" /></label>
+            </div>
+            <label class="case"><input type="checkbox" data-champ="adjacente" /><span>construction plus haute accolee (§5.3.6)</span></label>
+            <div class="groupe" data-groupe="adjacente">
+              <label><span>Contre la face</span>
+                <select data-champ="adj_face">
+                  <option value="y-">long pan y-</option>
+                  <option value="y+">long pan y+</option>
+                  <option value="x-">pignon x-</option>
+                  <option value="x+">pignon x+</option>
+                </select>
+              </label>
+              <label><span>Difference de hauteur h (m)</span><input type="text" inputmode="decimal" data-champ="adj_difference" /></label>
+              <label><span>Largeur b<sub>1</sub> de la toiture haute (m)</span><input type="text" inputmode="decimal" data-champ="adj_largeur" /></label>
+              <label><span>Pente de la toiture haute (&deg;)</span><input type="text" inputmode="decimal" data-champ="adj_pente" /></label>
+            </div>
+          </fieldset>
+          <p data-role="erreur-saisie" class="erreur" role="alert" hidden></p>
+        </form>
+      </section>
+
+      <div class="colonne">
+      <section id="vent" aria-label="actions du vent">
+        <h2>Vent</h2>
+        <p data-role="erreur-vent" class="erreur" role="alert" hidden></p>
+        <div data-role="vent-avertissements"></div>
+        <div class="selecteur">
+          <label for="cas-vent"><span>Cas de vent</span></label>
+          <select id="cas-vent" data-role="cas-vent"></select>
+        </div>
+        <div data-role="vent-schema"></div>
+        <div data-role="vent-corps"></div>
+      </section>
+
+      <section id="neige" aria-label="charges de neige">
+        <h2>Neige</h2>
+        <p data-role="erreur-neige" class="erreur" role="alert" hidden></p>
+        <div data-role="neige-avertissements"></div>
+        <div data-role="neige-schemas"></div>
+        <div data-role="neige-corps"></div>
+      </section>
+
+      <section id="sorties" aria-label="sorties">
+        <h2>Sorties</h2>
+        <div class="boutons">
+          <button type="button" data-action="exporter-dessins">Dessins (SVG)</button>
+          <button type="button" data-action="exporter-resultats">Resultats (CSV)</button>
+          <button type="button" data-action="exporter-json">Actions (JSON, pour combinaisons EN 1990)</button>
+          <button type="button" data-action="exporter-note">Note de calcul (HTML imprimable)</button>
+        </div>
+        <p class="note">
+          Le CSV porte une ligne par zone et par cas. Le JSON porte les actions caracteristiques, sans combinaison ni
+          coefficient partiel. La note s'ouvre dans un onglet et s'imprime en PDF par le navigateur.
+        </p>
+      </section>
+      </div>
+    </main>
+
+    <footer>
+      <p>
+        Hors perimetre : toitures a quatre versants, en sheds, en voute ; zonage au vent des toitures inclinees
+        (tableaux 7.3 et 7.4, lot suivant) ; batiments non rectangulaires ou elances (h/d &gt; 5) ; analyse dynamique ;
+        neige exceptionnelle ; calcul de c<sub>o</sub> par l'annexe A.3.
+      </p>
+    </footer>
+
+    <script type="module" src="./src/main.ts"></script>
+  </body>
+</html>
