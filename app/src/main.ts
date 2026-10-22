@@ -143,7 +143,9 @@ function peindreVent(vent: ResultatVent | string): void {
     .map((c, i) => `<option value="${i}"${i === casChoisi ? ' selected' : ''}>${c.libelle.replace(/</g, '&lt;')}</option>`)
     .join('');
   const cas = vent.cas[casChoisi];
-  zones.ventSchema.innerHTML = dessinCasDeVent(cas);
+  // Le schema affiche porte son propre bouton d'export : `dessins()` range
+  // les cas de vent en tete, l'indice du cas est donc celui du dessin.
+  zones.ventSchema.innerHTML = dessinCasDeVent(cas) + boutonDessin(casChoisi);
   zones.ventCorps.innerHTML = rendreCasDeVent(cas);
 }
 
@@ -159,7 +161,11 @@ function peindreNeige(neige: ResultatNeige | string, modele: ModeleSaisie): void
   zones.neigeAvert.innerHTML = rendreAvertissements(neige.avertissements);
   const sMax = chargeMaximale(neige.cas);
   const toiture = batimentDepuisModele(modele).toiture;
-  zones.neigeSchemas.innerHTML = neige.cas.map((c) => dessinCasDeNeige(c, toiture, sMax)).join('');
+  // Les cas de neige suivent, dans `dessins()`, tous les cas de vent.
+  const decalage = etat !== null && typeof etat.vent !== 'string' ? etat.vent.cas.length : 0;
+  zones.neigeSchemas.innerHTML = neige.cas
+    .map((c, i) => dessinCasDeNeige(c, toiture, sMax) + boutonDessin(decalage + i))
+    .join('');
   zones.neigeCorps.innerHTML = rendreNeige(neige);
 }
 
@@ -249,6 +255,15 @@ function sansCalcul(): void {
   montrer(zones.erreurSaisie, 'Aucun calcul a exporter : corriger la saisie, puis reessayer.');
 }
 
+/**
+ * Un bouton par schema. Exporter tous les schemas d'un clic lancait autant de
+ * telechargements d'affilee, et les navigateurs bloquent tous ceux qui
+ * suivent le premier : un seul fichier sortait.
+ */
+function boutonDessin(indice: number): string {
+  return `<button type="button" class="exporter-dessin" data-action="exporter-dessin" data-dessin="${indice}">Ce schema (SVG)</button>`;
+}
+
 function dessins(e: Etat): string[] {
   const liste: string[] = [];
   if (typeof e.vent !== 'string') liste.push(...e.vent.cas.map((c) => dessinCasDeVent(c)));
@@ -270,10 +285,12 @@ document.addEventListener('click', (evenement) => {
     return;
   }
   const e = etat;
-  if (action === 'exporter-dessins') {
-    dessins(e).forEach((svg, i) =>
-      telecharger(`charges-climatiques-${String(i + 1).padStart(2, '0')}.svg`, svgAutonome(svg, STYLES_TRACE), 'image/svg+xml;charset=utf-8')
-    );
+  if (action === 'exporter-dessin') {
+    const i = Number(cible.dataset.dessin);
+    const svg = dessins(e)[i];
+    if (svg !== undefined) {
+      telecharger(`charges-climatiques-${String(i + 1).padStart(2, '0')}.svg`, svgAutonome(svg, STYLES_TRACE), 'image/svg+xml;charset=utf-8');
+    }
   } else if (action === 'exporter-resultats') {
     telecharger(
       'charges-climatiques-resultats.csv',

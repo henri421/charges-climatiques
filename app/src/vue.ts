@@ -7,7 +7,6 @@
 
 import { echapper, nombreFr, type BlocResultat, type LigneResultat } from 'aedificium-ui';
 import type { CasDeVent, Origine, ProfilNormatif, ResultatNeige, ResultatVent } from '../../src/index';
-import { texteCpe, texteWnet } from './dessin-vent';
 
 const ORIGINES: Record<Origine, string> = {
   profil: 'profil',
@@ -178,25 +177,41 @@ export function blocsVent(r: ResultatVent | string): BlocResultat[] {
       note: r.toiture.applicable ? null : r.toiture.motif,
     },
   ];
+  // Chaque cas reprend EXACTEMENT ce que montre l'ecran (`rendreCasDeVent`) :
+  // grandeurs du cas, puis une ligne par zone et par valeur, issue de
+  // `lignesZones`, la meme fonction que le tableau a l'ecran.
   for (const c of r.cas) {
+    const fr = c.frottement;
     const lignes: LigneResultat[] = [
+      ligne('b x d', 'face au vent x profondeur', `${nombreFr(c.b, 2)} x ${nombreFr(c.d, 2)} m`),
+      ligne('e', 'min(b ; 2h), §7.2.2(2)', `${nombreFr(c.e, 2)} m`),
       ligne('c_pi', `pression interieure (${c.origineCpi})`, nombreFr(c.c_pi, 2)),
       ligne('w_i', 'q_p(h) x c_pi', `${nombreFr(c.w_i, 3)} kN/m2`),
       ligne('c_s c_d', c.motifStructural, nombreFr(c.c_s_c_d, 2)),
-      ligne('F_fr', c.frottement.motif, c.frottement.F_fr === undefined ? 'non applicable' : `${nombreFr(c.frottement.F_fr, 2)} kN`),
+      ligne(
+        'correlation',
+        'faces au vent et sous le vent, force d ensemble seulement (§7.2.2(3))',
+        nombreFr(c.facteurCorrelation, 3)
+      ),
+      ligne('F_fr', fr.motif, fr.applicable && fr.F_fr !== undefined ? `${nombreFr(fr.F_fr, 2)} kN` : 'non applicable'),
     ];
-    for (const f of c.faces) {
-      for (const z of f.zones) {
-        lignes.push(
-          ligne(
-            `${f.nom} ${z.nom}`,
-            `A = ${nombreFr(z.aire, 2)} m2, z_e = ${nombreFr(z.z_e, 2)} m, q_p = ${nombreFr(z.q_p, 3)} kN/m2, c_pe = ${texteCpe(z)}`,
-            `w_net = ${texteWnet(z)} kN/m2`
-          )
-        );
-      }
+    for (const [face, zone, A, z_e, q_p, c_pe_10, c_pe_1, c_pe, w_e, w_net] of lignesZones(c)) {
+      lignes.push(
+        ligne(
+          `${face} ${zone}`,
+          `A = ${A} m2, z_e = ${z_e} m, q_p = ${q_p} kN/m2, c_pe,10 = ${c_pe_10}, c_pe,1 = ${c_pe_1}, ` +
+            `c_pe = ${c_pe}, w_e = ${w_e} kN/m2`,
+          `w_net = ${w_net} kN/m2`
+        )
+      );
     }
-    blocs.push({ titre: c.libelle, lignes, note: null });
+    const bandes =
+      c.bandes.length > 1
+        ? `Face au vent decoupee en ${c.bandes.length} bandes (§7.2.2(1)) : ${c.bandes
+            .map((b) => `[${nombreFr(b.z_bas, 1)} ; ${nombreFr(b.z_haut, 1)}] m a z_e = ${nombreFr(b.z_e, 1)} m`)
+            .join(', ')}.`
+        : null;
+    blocs.push({ titre: c.libelle, lignes, note: bandes });
   }
   return blocs;
 }

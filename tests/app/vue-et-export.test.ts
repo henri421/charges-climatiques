@@ -49,6 +49,22 @@ describe('blocs de sortie', () => {
     expect(blocsVent(vent)).toHaveLength(1 + vent.cas.length);
   });
 
+  it('la note reprend TOUT le tableau d un cas de vent affiche a l ecran', () => {
+    // Concordance ecran / note : chaque grandeur du cas et chaque cellule du
+    // tableau des zones se retrouvent dans le bloc du cas.
+    vent.cas.forEach((cas, i) => {
+      const bloc = blocsVent(vent)[1 + i];
+      const texte = bloc.lignes.map((l) => `${l.symbole} ${l.libelle} ${l.valeur}`).join('\n');
+
+      for (const symbole of ['b x d', 'e', 'c_pi', 'w_i', 'c_s c_d', 'correlation', 'F_fr']) {
+        expect(bloc.lignes.map((l) => l.symbole), `cas ${i + 1}, ${symbole}`).toContain(symbole);
+      }
+      for (const rangee of lignesZones(cas)) {
+        for (const cellule of rangee) expect(texte, `cas ${i + 1}, ${rangee[0]} ${rangee[1]}`).toContain(cellule);
+      }
+    });
+  });
+
   it('les charges en rive non applicables restent presentes avec leur motif', () => {
     const blocs = blocsNeige(neige);
     const debord = blocs.find((b) => b.titre.startsWith('Neige en debord'));
