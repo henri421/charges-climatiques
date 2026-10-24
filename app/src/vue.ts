@@ -5,13 +5,21 @@
  * Module PUR. Unites affichees : m, m2, m/s, kN/m2, kN, kN/m.
  */
 
-import { echapper, nombreFr, type BlocResultat, type LigneResultat } from 'aedificium-ui';
+import { echapper, nombreFr, notationHtml, type BlocResultat, type LigneResultat } from 'aedificium-ui';
 import type { CasDeVent, Origine, ProfilNormatif, ResultatNeige, ResultatVent } from '../../src/index';
+import type { ModeleSaisie } from './form';
 
 const ORIGINES: Record<Origine, string> = {
   profil: 'profil',
   saisi: 'saisie',
   'defaut-recommande': 'defaut',
+};
+
+/** Libelles des provenances de pression interieure, jamais leur identifiant. */
+const ORIGINES_CPI: Record<CasDeVent['origineCpi'], string> = {
+  'face-dominante': 'face dominante',
+  'enveloppe-positive': 'enveloppe positive',
+  'enveloppe-negative': 'enveloppe negative',
 };
 
 /** Message d'une erreur du noyau, pour la banniere. */
@@ -25,9 +33,9 @@ function ligne(symbole: string, libelle: string, valeur: string): LigneResultat 
 
 /** Bandeau permanent du profil actif. */
 export function bandeauProfil(profil: ProfilNormatif): string {
-  return `<p class="profil-nom"><strong>${echapper(profil.nom)}</strong> · donnees consultees le ${echapper(
+  return `<p class="profil-nom"><strong>${notationHtml(profil.nom)}</strong> · donnees consultees le ${notationHtml(
     profil.date
-  )}</p><p class="profil-perimetre">${echapper(profil.perimetre)}</p>`;
+  )}</p><p class="profil-perimetre">${notationHtml(profil.perimetre)}</p>`;
 }
 
 /** Tableau des provenances : chaque grandeur de base et d'ou elle vient. */
@@ -35,9 +43,9 @@ export function tableauOrigines(profil: ProfilNormatif, vent: ResultatVent | nul
   const lignes: string[] = [];
   const ajouter = (sym: string, lib: string, val: string, orig: string, source: string): void => {
     lignes.push(
-      `<tr><th>${echapper(sym)}</th><td class="libelle">${echapper(lib)}</td><td class="valeur">${echapper(
+      `<tr><th>${notationHtml(sym)}</th><td class="libelle">${notationHtml(lib)}</td><td class="valeur">${notationHtml(
         val
-      )}</td><td class="origine origine-${echapper(orig)}">${echapper(orig)}</td><td class="source">${echapper(source)}</td></tr>`
+      )}</td><td class="origine origine-${echapper(orig)}">${notationHtml(orig)}</td><td class="source">${notationHtml(source)}</td></tr>`
     );
   };
   if (vent !== null) {
@@ -65,7 +73,7 @@ export function tableauOrigines(profil: ProfilNormatif, vent: ResultatVent | nul
       neige.origines.C_t === 'saisi' ? 'justification hors outil' : profil.neige.C_t.source
     );
   }
-  if (lignes.length === 0) return '<p class="note">Aucune grandeur de base exploitable : renseigner v_b,0 et s_k.</p>';
+  if (lignes.length === 0) return `<p class="note">${notationHtml('Aucune grandeur de base exploitable : renseigner v_b,0 et s_k.')}</p>`;
   return `<table class="grandeurs origines"><thead><tr><th>Grandeur</th><th class="libelle">Libelle</th><th class="valeur">Valeur</th><th>Origine</th><th>Source</th></tr></thead><tbody>${lignes.join(
     ''
   )}</tbody></table>`;
@@ -105,7 +113,7 @@ const ENTETES_ZONES = ['Face', 'Zone', 'A (m2)', 'z_e (m)', 'q_p (kN/m2)', 'c_pe
 /** Tableau HTML des zones d'un cas de vent, et ses grandeurs de cas. */
 export function rendreCasDeVent(cas: CasDeVent): string {
   const corps = lignesZones(cas)
-    .map((l) => `<tr>${l.map((c, i) => (i < 2 ? `<td>${echapper(c)}</td>` : `<td class="valeur">${echapper(c)}</td>`)).join('')}</tr>`)
+    .map((l) => `<tr>${l.map((c, i) => (i < 2 ? `<td>${notationHtml(c)}</td>` : `<td class="valeur">${notationHtml(c)}</td>`)).join('')}</tr>`)
     .join('');
   const bandes =
     cas.bandes.length > 1
@@ -117,13 +125,13 @@ export function rendreCasDeVent(cas: CasDeVent): string {
   return `<table class="grandeurs cas-generaux"><tbody>
 <tr><th>b x d</th><td class="libelle">face au vent x profondeur</td><td class="valeur">${nombreFr(cas.b, 2)} x ${nombreFr(cas.d, 2)} m</td></tr>
 <tr><th>e</th><td class="libelle">min(b ; 2h), §7.2.2(2)</td><td class="valeur">${nombreFr(cas.e, 2)} m</td></tr>
-<tr><th>c_pi</th><td class="libelle">pression interieure (${echapper(cas.origineCpi)})</td><td class="valeur">${nombreFr(cas.c_pi, 2)}</td></tr>
+<tr><th>c_pi</th><td class="libelle">pression interieure (${notationHtml(ORIGINES_CPI[cas.origineCpi])})</td><td class="valeur">${nombreFr(cas.c_pi, 2)}</td></tr>
 <tr><th>w_i</th><td class="libelle">q_p(h) x c_pi</td><td class="valeur">${nombreFr(cas.w_i, 3)} kN/m2</td></tr>
-<tr><th>c_s c_d</th><td class="libelle">${echapper(cas.motifStructural)}</td><td class="valeur">${nombreFr(cas.c_s_c_d, 2)}</td></tr>
+<tr><th>c_s c_d</th><td class="libelle">${notationHtml(cas.motifStructural)}</td><td class="valeur">${nombreFr(cas.c_s_c_d, 2)}</td></tr>
 <tr><th>correlation</th><td class="libelle">faces au vent et sous le vent, force d ensemble seulement (§7.2.2(3))</td><td class="valeur">${nombreFr(cas.facteurCorrelation, 3)}</td></tr>
-<tr><th>F_fr</th><td class="libelle">${echapper(fr.motif)}</td><td class="valeur">${fr.applicable && fr.F_fr !== undefined ? `${nombreFr(fr.F_fr, 2)} kN` : 'non applicable'}</td></tr>
+<tr><th>F_fr</th><td class="libelle">${notationHtml(fr.motif)}</td><td class="valeur">${fr.applicable && fr.F_fr !== undefined ? `${nombreFr(fr.F_fr, 2)} kN` : 'non applicable'}</td></tr>
 </tbody></table>${bandes}
-<div class="defilement"><table class="zones"><thead><tr>${ENTETES_ZONES.map((e) => `<th>${echapper(e)}</th>`).join('')}</tr></thead><tbody>${corps}</tbody></table></div>`;
+<div class="defilement"><table class="zones"><thead><tr>${ENTETES_ZONES.map((e) => `<th>${notationHtml(e)}</th>`).join('')}</tr></thead><tbody>${corps}</tbody></table></div>`;
 }
 
 /** Tableau HTML des cas de neige et des charges en rive. */
@@ -134,9 +142,9 @@ export function rendreNeige(r: ResultatNeige): string {
         .map((t) => `x ${nombreFr(t.x0, 2)} → ${nombreFr(t.x1, 2)} m : s ${nombreFr(t.s0, 3)} → ${nombreFr(t.s1, 3)}`)
         .join(' ; ');
       const inter = c.intermediaires.map((i) => `${i.symbole} = ${nombreFr(i.valeur, 3)}${i.unite === '-' ? '' : ` ${i.unite}`}`).join(' · ');
-      return `<tr><td>${echapper(c.nom)}</td><td class="libelle">${echapper(c.description)}<br><span class="clause">${echapper(
+      return `<tr><td>${notationHtml(c.nom)}</td><td class="libelle">${notationHtml(c.description)}<br><span class="clause">${notationHtml(
         c.clause
-      )}</span></td><td class="libelle">${echapper(inter)}</td><td class="libelle">${echapper(troncons)}</td></tr>`;
+      )}</span></td><td class="libelle">${notationHtml(inter)}</td><td class="libelle">${notationHtml(troncons)}</td></tr>`;
     })
     .join('');
   const rives = (titre: string, bloc: ResultatNeige['debord']): string =>
@@ -144,10 +152,10 @@ export function rendreNeige(r: ResultatNeige): string {
       ? bloc.charges
           .map(
             (c) =>
-              `<tr><th>${echapper(c.nom)}</th><td class="libelle">${echapper(`${c.clause} · ${c.detail}`)}</td><td class="valeur">${nombreFr(c.valeur, 3)} kN/m</td></tr>`
+              `<tr><th>${notationHtml(c.nom)}</th><td class="libelle">${notationHtml(`${c.clause} · ${c.detail}`)}</td><td class="valeur">${nombreFr(c.valeur, 3)} kN/m</td></tr>`
           )
           .join('')
-      : `<tr><th>${echapper(titre)}</th><td class="libelle">${echapper(bloc.motif)}</td><td class="valeur">non applicable</td></tr>`;
+      : `<tr><th>${notationHtml(titre)}</th><td class="libelle">${notationHtml(bloc.motif)}</td><td class="valeur">non applicable</td></tr>`;
   return `<table class="grandeurs"><tbody>
 <tr><th>s_k</th><td class="libelle">charge au sol, saisie</td><td class="valeur">${nombreFr(r.s_k, 2)} kN/m2</td></tr>
 <tr><th>C_e x C_t</th><td class="libelle">exposition x thermique</td><td class="valeur">${nombreFr(r.C_e, 2)} x ${nombreFr(r.C_t, 2)}</td></tr>
@@ -158,7 +166,7 @@ export function rendreNeige(r: ResultatNeige): string {
 
 /** Avertissements, en blocs d'alerte. */
 export function rendreAvertissements(avertissements: readonly string[]): string {
-  return avertissements.map((a) => `<p class="alerte">${echapper(a)}</p>`).join('');
+  return avertissements.map((a) => `<p class="alerte">${notationHtml(a)}</p>`).join('');
 }
 
 // --- Blocs des sorties --------------------------------------------------------
@@ -253,4 +261,48 @@ export function blocsNeige(r: ResultatNeige | string): BlocResultat[] {
     });
   }
   return blocs;
+}
+
+/** Blocs des donnees saisies, pour la note et le CSV. */
+export function blocsDEntree(m: ModeleSaisie): BlocResultat[] {
+  const toiture =
+    m.toiture === 'plate'
+      ? `plate, acrotere ${m.acrotere} m`
+      : m.toiture === 'un-versant'
+        ? `un versant, ${m.pente} degres`
+        : `deux versants, ${m.pente1} / ${m.pente2} degres`;
+  return [
+    {
+      titre: 'Batiment',
+      lignes: [
+        ligne('L x l x h', 'longueur x largeur x hauteur', `${m.longueur} x ${m.largeur} x ${m.hauteur} m`),
+        ligne('toiture', 'type de toiture', toiture),
+        ligne(
+          'c_pi',
+          'pression interieure',
+          m.piMode === 'enveloppe' ? 'enveloppe' : `face dominante ${m.piFace}, rapport ${m.piRapport}`
+        ),
+      ],
+      note: null,
+    },
+    {
+      titre: 'Site',
+      lignes: [
+        ligne('v_b,0', 'vitesse de reference de base, saisie', m.v_b0 === null ? 'non renseignee' : `${m.v_b0} m/s`),
+        ligne('terrain', 'categorie de terrain', m.categorie),
+        ligne('s_k', 'charge de neige au sol, saisie', m.s_k === null ? 'non renseignee' : `${m.s_k} kN/m2`),
+        ligne('altitude', 'altitude du site', `${m.altitude} m`),
+        ligne('topographie', 'topographie (neige)', m.topographie),
+      ],
+      note: null,
+    },
+  ];
+}
+
+/** Avertissements portes par la note : le motif d'un calcul absent en tete. */
+export function avertissementsDeLaNote(vent: ResultatVent | string, neige: ResultatNeige | string): string[] {
+  return [
+    ...(typeof vent === 'string' ? [`Vent non calcule : ${vent}`] : vent.avertissements),
+    ...(typeof neige === 'string' ? [`Neige non calculee : ${neige}`] : neige.avertissements),
+  ];
 }

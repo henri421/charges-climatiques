@@ -10,7 +10,7 @@
  * sont c_pe et la pression nette w_net = w_e - w_i du cas.
  */
 
-import { echapper, nombreFr } from 'aedificium-ui';
+import { notationSvg, notationTexte, nombreFr } from 'aedificium-ui';
 import type { CasDeVent, Face, Zone } from '../../src/index';
 
 const LARGEUR_SVG = 680;
@@ -70,10 +70,10 @@ function dessinerZones(face: Face, c: Cadre): string {
       const texte =
         largeurPx >= 12 && hauteurPx >= 14
           ? `<text class="zone-texte" x="${cx.toFixed(1)}" y="${(cy - (lignes.length - 1) * 7).toFixed(1)}">${lignes
-              .map((l, i) => `<tspan x="${cx.toFixed(1)}" dy="${i === 0 ? 0 : 14}"${i === 0 ? ' class="zone-nom"' : ''}>${echapper(l)}</tspan>`)
+              .map((l, i) => `<tspan x="${cx.toFixed(1)}" dy="${i === 0 ? 0 : 14}"${i === 0 ? ' class="zone-nom"' : ''}>${notationSvg(l)}</tspan>`)
               .join('')}</text>`
           : '';
-      return `<polygon class="${classeZone(z)}" points="${pts.join(' ')}"><title>${echapper(
+      return `<polygon class="${classeZone(z)}" points="${pts.join(' ')}"><title>${notationTexte(
         `Zone ${z.nom} : c_pe = ${texteCpe(z)}, w_net = ${texteWnet(z)} kN/m2`
       )}</title></polygon>${texte}`;
     })
@@ -111,7 +111,7 @@ export function dessinCasDeVent(cas: CasDeVent): string {
     for (const f of rangee) {
       const yFace = y + (hRangee - f.hauteur) * echelle;
       morceaux.push(
-        `<g class="face"><text class="face-titre" x="${x.toFixed(1)}" y="${(y - 8).toFixed(1)}">${echapper(
+        `<g class="face"><text class="face-titre" x="${x.toFixed(1)}" y="${(y - 8).toFixed(1)}">${notationSvg(
           `${f.nom} · ${ROLES[f.role]}`
         )}</text>${dessinerZones(f, { x, y: yFace, echelle, hauteurFace: f.hauteur })}<rect class="face-cadre" x="${x.toFixed(1)}" y="${yFace.toFixed(1)}" width="${(f.largeur * echelle).toFixed(1)}" height="${(f.hauteur * echelle).toFixed(1)}"/></g>`
       );
@@ -145,7 +145,7 @@ export function dessinCasDeVent(cas: CasDeVent): string {
   }
 
   const titre = `${cas.libelle} · e = ${nombreFr(cas.e, 2)} m · w_i = ${signe(cas.w_i, 3)} kN/m2`;
-  return `<svg class="schema-vent" viewBox="0 0 ${LARGEUR_SVG} ${hauteurSvg.toFixed(0)}" role="img" aria-label="${echapper(
+  return `<svg class="schema-vent" viewBox="0 0 ${LARGEUR_SVG} ${hauteurSvg.toFixed(0)}" role="img" aria-label="${notationTexte(
     `Zonage du vent, ${cas.libelle}`
-  )}"><text class="titre" x="${MARGE}" y="${MARGE}">${echapper(titre)}</text>${morceaux.join('')}</svg>`;
+  )}"><text class="titre" x="${MARGE}" y="${MARGE}">${notationSvg(titre)}</text>${morceaux.join('')}</svg>`;
 }

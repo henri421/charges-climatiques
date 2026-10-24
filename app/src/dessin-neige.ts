@@ -6,7 +6,7 @@
  * Module PUR : il rend une chaine SVG.
  */
 
-import { echapper, nombreFr } from 'aedificium-ui';
+import { notationSvg, notationTexte, nombreFr } from 'aedificium-ui';
 import type { CasDeNeige, Toiture } from '../../src/index';
 import { largeursDesVersants } from '../../src/index';
 
@@ -82,9 +82,9 @@ export function dessinCasDeNeige(cas: CasDeNeige, toiture: Toiture, sMax: number
     cas.repere === 'toiture'
       ? `x de 0 (rive y-) a ${nombreFr(longueur, 2)} m`
       : `x depuis le mur ou l obstacle, jusqu a ${nombreFr(longueur, 2)} m`;
-  return `<svg class="schema-neige" viewBox="0 0 ${LARGEUR_SVG} ${hauteur.toFixed(0)}" role="img" aria-label="${echapper(
+  return `<svg class="schema-neige" viewBox="0 0 ${LARGEUR_SVG} ${hauteur.toFixed(0)}" role="img" aria-label="${notationTexte(
     cas.nom
-  )}"><text class="titre" x="${MARGE}" y="${MARGE}">${echapper(`${cas.nom} — ${cas.description}`)}</text>${poly}<line class="base" x1="${X(0)}" y1="${Y(0)}" x2="${X(longueur)}" y2="${Y(0)}"/>${etiquettes.join('')}${support}<text class="legende" x="${MARGE}" y="${(hauteur - 8).toFixed(1)}">${echapper(
+  )}"><text class="titre" x="${MARGE}" y="${MARGE}">${notationSvg(`${cas.nom} — ${cas.description}`)}</text>${poly}<line class="base" x1="${X(0)}" y1="${Y(0)}" x2="${X(longueur)}" y2="${Y(0)}"/>${etiquettes.join('')}${support}<text class="legende" x="${MARGE}" y="${(hauteur - 8).toFixed(1)}">${notationSvg(
     `s en kN/m2 de projection horizontale · ${legende}`
   )}</text></svg>`;
 }

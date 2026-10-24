@@ -8,7 +8,15 @@
  * n'empeche pas l'affichage de l'autre.
  */
 
-import { ouvrirOuTelecharger, resultatsEnCsv, svgAutonome, telecharger, type BlocResultat } from 'aedificium-ui';
+import {
+  blocsEnTexte,
+  notationHtml,
+  notationTexte,
+  ouvrirOuTelecharger,
+  resultatsEnCsv,
+  svgAutonome,
+  telecharger,
+} from 'aedificium-ui';
 import {
   ec1Recommande,
   exporterActions,
@@ -29,7 +37,9 @@ import {
 import { dessinCasDeVent } from './dessin-vent';
 import { chargeMaximale, dessinCasDeNeige } from './dessin-neige';
 import {
+  avertissementsDeLaNote,
   bandeauProfil,
+  blocsDEntree,
   blocsNeige,
   blocsVent,
   messageDErreur,
@@ -38,7 +48,7 @@ import {
   rendreNeige,
   tableauOrigines,
 } from './vue';
-import { STYLES_TRACE, noteDeCalculHtml } from './export';
+import { HYPOTHESES, STYLES_TRACE, noteDeCalculHtml } from './export';
 import './style.css';
 
 /** Element attendu de la page ; son absence est une erreur de developpement. */
@@ -110,7 +120,7 @@ function ajusterLesGroupes(m: ModeleSaisie): void {
 }
 
 function montrer(el: HTMLElement, message: string | null): void {
-  el.textContent = message ?? '';
+  el.innerHTML = message === null ? '' : notationHtml(message);
   el.hidden = message === null;
 }
 
@@ -140,7 +150,7 @@ function peindreVent(vent: ResultatVent | string): void {
   zones.ventAvert.innerHTML = rendreAvertissements(avert);
   if (casChoisi >= vent.cas.length) casChoisi = 0;
   selecteurCas.innerHTML = vent.cas
-    .map((c, i) => `<option value="${i}"${i === casChoisi ? ' selected' : ''}>${c.libelle.replace(/</g, '&lt;')}</option>`)
+    .map((c, i) => `<option value="${i}"${i === casChoisi ? ' selected' : ''}>${notationTexte(c.libelle).replace(/</g, '&lt;')}</option>`)
     .join('');
   const cas = vent.cas[casChoisi];
   // Le schema affiche porte son propre bouton d'export : `dessins()` range
@@ -211,46 +221,6 @@ function rafraichir(): void {
 
 // --- Sorties --------------------------------------------------------------------
 
-function blocsDEntree(m: ModeleSaisie): BlocResultat[] {
-  const toiture =
-    m.toiture === 'plate'
-      ? `plate, acrotere ${m.acrotere} m`
-      : m.toiture === 'un-versant'
-        ? `un versant, ${m.pente} degres`
-        : `deux versants, ${m.pente1} / ${m.pente2} degres`;
-  return [
-    {
-      titre: 'Batiment',
-      lignes: [
-        { symbole: 'L x l x h', libelle: 'longueur x largeur x hauteur', valeur: `${m.longueur} x ${m.largeur} x ${m.hauteur} m` },
-        { symbole: 'toiture', libelle: 'type de toiture', valeur: toiture },
-        { symbole: 'c_pi', libelle: 'pression interieure', valeur: m.piMode === 'enveloppe' ? 'enveloppe' : `face dominante ${m.piFace}, rapport ${m.piRapport}` },
-      ],
-      note: null,
-    },
-    {
-      titre: 'Site',
-      lignes: [
-        { symbole: 'v_b,0', libelle: 'vitesse de reference de base, saisie', valeur: m.v_b0 === null ? 'non renseignee' : `${m.v_b0} m/s` },
-        { symbole: 'terrain', libelle: 'categorie de terrain', valeur: m.categorie },
-        { symbole: 's_k', libelle: 'charge de neige au sol, saisie', valeur: m.s_k === null ? 'non renseignee' : `${m.s_k} kN/m2` },
-        { symbole: 'altitude', libelle: 'altitude du site', valeur: `${m.altitude} m` },
-        { symbole: 'topographie', libelle: 'topographie (neige)', valeur: m.topographie },
-      ],
-      note: null,
-    },
-  ];
-}
-
-const HYPOTHESES = [
-  'Batiment a base rectangulaire ; methode de la pression de pointe (EN 1991-1-4 §4.5).',
-  'Hauteur de reference des parois laterales, sous le vent et de la toiture : z_e = h. Pression interieure a z_i = h.',
-  'Bandes intermediaires de la face au vent de hauteur au plus b, a z_e = leur sommet.',
-  'Zonage au vent des toitures inclinees non traite dans cette version.',
-  'Neige : situations durables et transitoires ; neige exceptionnelle hors perimetre.',
-  'Valeurs recommandees de l Eurocode, sauf grandeurs de base saisies ; aucune annexe nationale codee.',
-];
-
 function sansCalcul(): void {
   montrer(zones.erreurSaisie, 'Aucun calcul a exporter : corriger la saisie, puis reessayer.');
 }
@@ -294,7 +264,7 @@ document.addEventListener('click', (evenement) => {
   } else if (action === 'exporter-resultats') {
     telecharger(
       'charges-climatiques-resultats.csv',
-      resultatsEnCsv([...blocsDEntree(e.modele), ...blocsVent(e.vent), ...blocsNeige(e.neige)]),
+      resultatsEnCsv(blocsEnTexte([...blocsDEntree(e.modele), ...blocsVent(e.vent), ...blocsNeige(e.neige)])),
       'text/csv;charset=utf-8'
     );
   } else if (action === 'exporter-json') {
@@ -304,10 +274,7 @@ document.addEventListener('click', (evenement) => {
       'application/json;charset=utf-8'
     );
   } else if (action === 'exporter-note') {
-    const avert = [
-      ...(typeof e.vent === 'string' ? [`Vent non calcule : ${e.vent}`] : e.vent.avertissements),
-      ...(typeof e.neige === 'string' ? [`Neige non calculee : ${e.neige}`] : e.neige.avertissements),
-    ];
+    const avert = avertissementsDeLaNote(e.vent, e.neige);
     const html = noteDeCalculHtml(
       {
         titre: `Batiment ${e.modele.longueur} x ${e.modele.largeur} x ${e.modele.hauteur} m`,
