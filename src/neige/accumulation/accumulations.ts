@@ -9,6 +9,7 @@
  */
 
 import type { CasDeNeige } from '../../domaines/resultat';
+import { nombreAffiche } from '../../format';
 import type { ProfilNormatif } from '../../norms/profil';
 import { exigerPositif, exigerPositifOuNul } from '../../norms/profil';
 import type { ObstacleNeige, ToitureAdjacente } from '../../model/site';
@@ -44,7 +45,7 @@ export function accumulationObstacle(
   const l_s = longueurAccumulation(profil, h);
   return {
     nom: `Accumulation : ${obstacle.nom}`,
-    description: `Accumulation contre l obstacle « ${obstacle.nom} » (h = ${h} m)`,
+    description: `Accumulation contre l obstacle « ${obstacle.nom} » (h = ${nombreAffiche(h)} m)`,
     clause: 'EN 1991-1-3 §6.2, figure 6.1',
     repere: 'depuis-obstacle',
     troncons: [troncon(0, l_s, mu2, m1, facteur)],

@@ -11,6 +11,7 @@
  */
 
 import type { CasDeNeige, ChargeLineique, ResultatNeige } from '../domaines/resultat';
+import { nombreAffiche } from '../format';
 import type { Batiment } from '../model/batiment';
 import type { Site } from '../model/site';
 import type { Origine, ProfilNormatif } from '../norms/profil';
@@ -99,7 +100,7 @@ export function verifierNeige(profil: ProfilNormatif, batiment: Batiment, site: 
     };
     if (site.altitude > ALTITUDE_DEBORD) {
       avertissements.push(
-        `Site a ${site.altitude} m : au-dessus de ${ALTITUDE_DEBORD} m, le §6.3(1) recommande de ` +
+        `Site a ${nombreAffiche(site.altitude)} m : au-dessus de ${ALTITUDE_DEBORD} m, le §6.3(1) recommande de ` +
           'considerer la neige en debord de rive, qui n a pas ete demandee.'
       );
     }

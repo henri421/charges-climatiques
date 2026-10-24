@@ -10,7 +10,7 @@
  * sont c_pe et la pression nette w_net = w_e - w_i du cas.
  */
 
-import { notationSvg, notationTexte, nombreFr } from 'aedificium-ui';
+import { nombreAffiche, nombreFr, notationSvg, notationTexte } from 'aedificium-ui';
 import type { CasDeVent, Face, Zone } from '../../src/index';
 
 const LARGEUR_SVG = 680;
@@ -25,9 +25,24 @@ const ROLES: Record<string, string> = {
   toiture: 'toiture (plan)',
 };
 
+/** Nombre affiche : trois decimales au plus, sans zeros inutiles. */
+function aff(valeur: number, decimales = 3): string {
+  return nombreAffiche(valeur, Math.min(decimales, 3));
+}
+
+/**
+ * Signe explicite devant une valeur positive. `nombreFr` sert ici a
+ * `texteCpe`, dont le contrat public (deux decimales) est fige par les tests.
+ */
 function signe(v: number, decimales: number): string {
   const t = nombreFr(v, decimales);
   return v > 0 && t !== nombreFr(0, decimales) ? `+${t}` : t;
+}
+
+/** Meme regle de signe, mais sans zeros inutiles : ce que lisent les dessins. */
+function signeAffiche(v: number, decimales: number): string {
+  const t = aff(v, decimales);
+  return v > 0 && t !== '0' ? `+${t}` : t;
 }
 
 function classeZone(z: Zone): string {
@@ -44,6 +59,15 @@ export function texteCpe(z: Zone): string {
 /** Texte de w_net : une ou deux valeurs (kN/m2). */
 export function texteWnet(z: Zone): string {
   return z.valeurs.map((v) => signe(v.w_net, 2)).join(' / ');
+}
+
+/** Memes textes que ceux du dessin : sans zeros inutiles. */
+function texteCpeAffiche(z: Zone): string {
+  return z.valeurs.map((v) => signeAffiche(v.c_pe, 2)).join(' / ');
+}
+
+function texteWnetAffiche(z: Zone): string {
+  return z.valeurs.map((v) => signeAffiche(v.w_net, 2)).join(' / ');
 }
 
 interface Cadre {
@@ -65,8 +89,8 @@ function dessinerZones(face: Face, c: Cadre): string {
       const cx = c.x + ((Math.max(...xs) + Math.min(...xs)) / 2) * c.echelle;
       const cy = c.y + (c.hauteurFace - (Math.max(...ys) + Math.min(...ys)) / 2) * c.echelle;
       const lignes: string[] = [z.nom];
-      if (largeurPx >= 46 && hauteurPx >= 40) lignes.push(texteCpe(z));
-      if (largeurPx >= 46 && hauteurPx >= 56) lignes.push(texteWnet(z));
+      if (largeurPx >= 46 && hauteurPx >= 40) lignes.push(texteCpeAffiche(z));
+      if (largeurPx >= 46 && hauteurPx >= 56) lignes.push(texteWnetAffiche(z));
       const texte =
         largeurPx >= 12 && hauteurPx >= 14
           ? `<text class="zone-texte" x="${cx.toFixed(1)}" y="${(cy - (lignes.length - 1) * 7).toFixed(1)}">${lignes
@@ -74,7 +98,7 @@ function dessinerZones(face: Face, c: Cadre): string {
               .join('')}</text>`
           : '';
       return `<polygon class="${classeZone(z)}" points="${pts.join(' ')}"><title>${notationTexte(
-        `Zone ${z.nom} : c_pe = ${texteCpe(z)}, w_net = ${texteWnet(z)} kN/m2`
+        `Zone ${z.nom} : c_pe = ${texteCpeAffiche(z)}, w_net = ${texteWnetAffiche(z)} kN/m2`
       )}</title></polygon>${texte}`;
     })
     .join('');
@@ -144,7 +168,7 @@ export function dessinCasDeVent(cas: CasDeVent): string {
     hauteurSvg = fy + MARGE;
   }
 
-  const titre = `${cas.libelle} · e = ${nombreFr(cas.e, 2)} m · w_i = ${signe(cas.w_i, 3)} kN/m2`;
+  const titre = `${cas.libelle} · e = ${aff(cas.e, 2)} m · w_i = ${signeAffiche(cas.w_i, 3)} kN/m2`;
   return `<svg class="schema-vent" viewBox="0 0 ${LARGEUR_SVG} ${hauteurSvg.toFixed(0)}" role="img" aria-label="${notationTexte(
     `Zonage du vent, ${cas.libelle}`
   )}"><text class="titre" x="${MARGE}" y="${MARGE}">${notationSvg(titre)}</text>${morceaux.join('')}</svg>`;

@@ -4,6 +4,7 @@
  * Unites : hauteurs en m, coefficients sans dimension.
  */
 
+import { nombreAffiche } from '../format';
 import type { CategorieTerrain } from '../model/site';
 
 export interface ParametresTerrain {
@@ -39,7 +40,7 @@ export function hauteurDeCalcul(categorie: CategorieTerrain, z: number): number 
     throw new Error('La hauteur z doit etre un nombre strictement positif (m).');
   }
   if (z > Z_MAX) {
-    throw new Error(`La hauteur z = ${z} m depasse z_max = ${Z_MAX} m : hors du domaine du §4.3.2.`);
+    throw new Error(`La hauteur z = ${nombreAffiche(z)} m depasse z_max = ${Z_MAX} m : hors du domaine du §4.3.2.`);
   }
   return Math.max(z, TERRAINS[categorie].z_min);
 }

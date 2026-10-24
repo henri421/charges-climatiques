@@ -7,6 +7,8 @@
  * fixations, le bardage et les menuiseries, qui se dimensionnent avec c_pe,1.
  */
 
+import { nombreAffiche } from '../../format';
+
 /** Paire de coefficients d'une zone : c_pe,10 et c_pe,1. */
 export interface PaireCpe {
   c_pe_10: number;
@@ -64,7 +66,7 @@ export function cpeParoi(zone: ZoneParoi, hd: number): PaireCpe {
   }
   if (hd > 5) {
     throw new Error(
-      `h/d = ${hd.toFixed(2)} > 5 : le tableau 7.1 ne s applique plus, la norme renvoie aux ` +
+      `h/d = ${nombreAffiche(hd, 2)} > 5 : le tableau 7.1 ne s applique plus, la norme renvoie aux ` +
         'coefficients de force (§7.6 a §7.8), hors perimetre de cet outil.'
     );
   }
@@ -126,7 +128,7 @@ export function cpeToiturePlate(zone: ZoneToiturePlate, hp_h: number): CpeToitur
       hp_h: dernier.hp_h,
       avertissement:
         hp_h > dernier.hp_h
-          ? `h_p/h = ${hp_h.toFixed(3)} > 0,10 : valeurs du tableau 7.2 pour h_p/h = 0,10 retenues, du cote de la securite.`
+          ? `h_p/h = ${nombreAffiche(hp_h)} > 0,1 : valeurs du tableau 7.2 pour h_p/h = 0,1 retenues, du cote de la securite.`
           : null,
     };
   }

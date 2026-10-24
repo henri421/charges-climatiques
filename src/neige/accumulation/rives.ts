@@ -7,6 +7,7 @@
  */
 
 import type { ChargeLineique } from '../../domaines/resultat';
+import { nombreAffiche } from '../../format';
 import { exigerPositif } from '../../norms/profil';
 
 /**
@@ -26,7 +27,7 @@ export function chargeDeDebord(nomRive: string, s: number, gamma: number): Charg
     nom: `Debord, rive ${nomRive}`,
     clause: 'EN 1991-1-3 §6.3, expression (6.4)',
     valeur: s_e,
-    detail: `s = ${s.toFixed(3)} kN/m2, d = ${d.toFixed(3)} m, k = ${k.toFixed(3)}`,
+    detail: `s = ${nombreAffiche(s)} kN/m2, d = ${nombreAffiche(d)} m, k = ${nombreAffiche(k)}`,
   };
 }
 
@@ -44,6 +45,6 @@ export function effortArretDeNeige(nomVersant: string, s: number, b: number, alp
     nom: `Arret de neige, versant ${nomVersant}`,
     clause: 'EN 1991-1-3 §6.4, expression (6.5)',
     valeur: F_s,
-    detail: `s = ${s.toFixed(3)} kN/m2, b = ${b.toFixed(2)} m, alpha = ${alpha} degres`,
+    detail: `s = ${nombreAffiche(s)} kN/m2, b = ${nombreAffiche(b, 2)} m, alpha = ${nombreAffiche(alpha)} degres`,
   };
 }

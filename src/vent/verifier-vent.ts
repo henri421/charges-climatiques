@@ -14,6 +14,7 @@
  * position des ouvertures rompt la symetrie et les quatre sont rendues.
  */
 
+import { nombreAffiche } from '../format';
 import type { Batiment, NomFace } from '../model/batiment';
 import { longueurDeFace } from '../model/batiment';
 import type { Site } from '../model/site';
@@ -173,7 +174,7 @@ function cpeAuDroitDe(face: Face, abscisse: number): number {
       return z.valeurs[0].c_pe;
     }
   }
-  throw new Error(`L abscisse des ouvertures (${abscisse} m) sort de la face ${face.nom}.`);
+  throw new Error(`L abscisse des ouvertures (${nombreAffiche(abscisse)} m) sort de la face ${face.nom}.`);
 }
 
 /** Complete les pressions nettes d'une face pour une pression interieure w_i. */
@@ -267,7 +268,7 @@ export function verifierVent(
       const w_i = q_p_h * cpi.c_pi;
       cas.push({
         direction: dir.angle,
-        libelle: `Vent sur ${LIBELLES_FACES[dir.au_vent]}, c_pi = ${cpi.c_pi >= 0 ? '+' : ''}${cpi.c_pi.toFixed(2).replace('.', ',')}`,
+        libelle: `Vent sur ${LIBELLES_FACES[dir.au_vent]}, c_pi = ${cpi.c_pi >= 0 ? '+' : ''}${nombreAffiche(cpi.c_pi, 2)}`,
         b,
         d,
         e,

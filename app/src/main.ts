@@ -10,6 +10,7 @@
 
 import {
   blocsEnTexte,
+  nombreAffiche,
   notationHtml,
   notationTexte,
   ouvrirOuTelecharger,
@@ -277,7 +278,10 @@ document.addEventListener('click', (evenement) => {
     const avert = avertissementsDeLaNote(e.vent, e.neige);
     const html = noteDeCalculHtml(
       {
-        titre: `Batiment ${e.modele.longueur} x ${e.modele.largeur} x ${e.modele.hauteur} m`,
+        titre: `Batiment ${nombreAffiche(e.modele.longueur, 2)} x ${nombreAffiche(
+          e.modele.largeur,
+          2
+        )} x ${nombreAffiche(e.modele.hauteur, 2)} m`,
         date: new Date().toISOString().slice(0, 10),
         profil: `${PROFIL.nom} (${PROFIL.date})`,
         entrees: blocsDEntree(e.modele),

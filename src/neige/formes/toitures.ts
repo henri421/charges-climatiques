@@ -7,6 +7,7 @@
  */
 
 import type { CasDeNeige } from '../../domaines/resultat';
+import { nombreAffiche } from '../../format';
 import type { Toiture } from '../../model/batiment';
 import { mu1 } from './mu';
 import { troncon } from './troncon';
@@ -59,7 +60,7 @@ export function casSansAccumulation(
     return [
       {
         nom: 'Cas (i)',
-        description: `Toiture a un versant, alpha = ${toiture.pente} degres`,
+        description: `Toiture a un versant, alpha = ${nombreAffiche(toiture.pente)} degres`,
         clause: 'EN 1991-1-3 §5.3.3, figure 5.2',
         repere: 'toiture',
         troncons: [troncon(0, largeur, m, m, facteur)],

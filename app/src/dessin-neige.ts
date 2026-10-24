@@ -6,7 +6,7 @@
  * Module PUR : il rend une chaine SVG.
  */
 
-import { notationSvg, notationTexte, nombreFr } from 'aedificium-ui';
+import { nombreAffiche, notationSvg, notationTexte } from 'aedificium-ui';
 import type { CasDeNeige, Toiture } from '../../src/index';
 import { largeursDesVersants } from '../../src/index';
 
@@ -14,6 +14,11 @@ const LARGEUR_SVG = 640;
 const MARGE = 28;
 const HAUT_DIAGRAMME = 90;
 const HAUT_TOITURE = 46;
+
+/** Nombre affiche : trois decimales au plus, sans zeros inutiles. */
+function aff(valeur: number, decimales = 3): string {
+  return nombreAffiche(valeur, Math.min(decimales, 3));
+}
 
 /** Charge maximale de tous les cas, pour une echelle verticale commune (kN/m2). */
 export function chargeMaximale(cas: readonly CasDeNeige[]): number {
@@ -60,7 +65,7 @@ export function dessinCasDeNeige(cas: CasDeNeige, toiture: Toiture, sMax: number
     ] as const) {
       if (precedent !== null && Math.abs(precedent.x - x) < 1e-9 && Math.abs(precedent.s - s) < 1e-9) continue;
       etiquettes.push(
-        `<text class="valeur" text-anchor="${ancre}" x="${X(x)}" y="${(Number(Y(s)) - 5).toFixed(1)}">${nombreFr(s, 2)}</text>`
+        `<text class="valeur" text-anchor="${ancre}" x="${X(x)}" y="${(Number(Y(s)) - 5).toFixed(1)}">${aff(s, 2)}</text>`
       );
       precedent = { x, s };
     }
@@ -80,8 +85,8 @@ export function dessinCasDeNeige(cas: CasDeNeige, toiture: Toiture, sMax: number
   const hauteur = yBase + 12 + HAUT_TOITURE + 26;
   const legende =
     cas.repere === 'toiture'
-      ? `x de 0 (rive y-) a ${nombreFr(longueur, 2)} m`
-      : `x depuis le mur ou l obstacle, jusqu a ${nombreFr(longueur, 2)} m`;
+      ? `x de 0 (rive y-) a ${aff(longueur, 2)} m`
+      : `x depuis le mur ou l obstacle, jusqu a ${aff(longueur, 2)} m`;
   return `<svg class="schema-neige" viewBox="0 0 ${LARGEUR_SVG} ${hauteur.toFixed(0)}" role="img" aria-label="${notationTexte(
     cas.nom
   )}"><text class="titre" x="${MARGE}" y="${MARGE}">${notationSvg(`${cas.nom} — ${cas.description}`)}</text>${poly}<line class="base" x1="${X(0)}" y1="${Y(0)}" x2="${X(longueur)}" y2="${Y(0)}"/>${etiquettes.join('')}${support}<text class="legende" x="${MARGE}" y="${(hauteur - 8).toFixed(1)}">${notationSvg(

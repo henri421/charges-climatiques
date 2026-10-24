@@ -6,6 +6,7 @@
 
 import type { CoefficientStructural, Rugosite } from '../../model/batiment';
 import type { Constat } from '../../domaines/resultat';
+import { nombreAffiche } from '../../format';
 import { exigerPositif } from '../../norms/profil';
 
 /** Hauteur sous laquelle c_s c_d = 1, §6.2(1)a (m). */
@@ -31,7 +32,7 @@ export function coefficientStructural(cs: CoefficientStructural, h: number, d: n
     return { c_s_c_d: cs.valeur, motif: 'Valeur saisie, calculee hors de l outil (§6.3 ou annexes B et C).' };
   }
   if (h < HAUTEUR_DISPENSE) {
-    return { c_s_c_d: 1, motif: `h = ${h} m < ${HAUTEUR_DISPENSE} m : c_s c_d = 1 (§6.2(1)a).` };
+    return { c_s_c_d: 1, motif: `h = ${nombreAffiche(h)} m < ${HAUTEUR_DISPENSE} m : c_s c_d = 1 (§6.2(1)a).` };
   }
   if (cs.ossatureAvecMursDeContreventement && h < HAUTEUR_OSSATURE && h < 4 * d) {
     return {
@@ -40,7 +41,7 @@ export function coefficientStructural(cs: CoefficientStructural, h: number, d: n
     };
   }
   throw new Error(
-    `Aucun critere de dispense du §6.2(1) n est rempli (h = ${h} m, d = ${d} m). Le calcul de ` +
+    `Aucun critere de dispense du §6.2(1) n est rempli (h = ${nombreAffiche(h)} m, d = ${nombreAffiche(d)} m). Le calcul de ` +
       'c_s c_d (§6.3) est hors perimetre : saisir une valeur calculee par ailleurs.'
   );
 }
@@ -73,8 +74,8 @@ export function frottement(
     return {
       applicable: false,
       motif:
-        `Surfaces paralleles ${paralleles.toFixed(1)} m2 <= 4 x surfaces perpendiculaires ` +
-        `${(4 * perpendiculaires).toFixed(1)} m2 : frottement negligeable (§7.5(3)).`,
+        `Surfaces paralleles ${nombreAffiche(paralleles, 1)} m2 <= 4 x surfaces perpendiculaires ` +
+        `${nombreAffiche(4 * perpendiculaires, 1)} m2 : frottement negligeable (§7.5(3)).`,
     };
   }
   const distance = Math.min(2 * b, 4 * h);
@@ -83,7 +84,7 @@ export function frottement(
   const c_fr = COEFFICIENTS_FROTTEMENT[rugosite];
   return {
     applicable: true,
-    motif: `Surfaces paralleles > 4 x surfaces perpendiculaires : frottement au-dela de min(2b ; 4h) = ${distance.toFixed(2)} m (§7.5).`,
+    motif: `Surfaces paralleles > 4 x surfaces perpendiculaires : frottement au-dela de min(2b ; 4h) = ${nombreAffiche(distance, 2)} m (§7.5).`,
     F_fr: c_fr * q_p_h * A_fr,
     A_fr,
     c_fr,
