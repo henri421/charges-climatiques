@@ -79,9 +79,9 @@ export function tableauOrigines(profil: ProfilNormatif, vent: ResultatVent | nul
     );
   }
   if (lignes.length === 0) return `<p class="note">${notationHtml('Aucune grandeur de base exploitable : renseigner v_b,0 et s_k.')}</p>`;
-  return `<table class="grandeurs origines"><thead><tr><th>Grandeur</th><th class="libelle">Libellé</th><th class="valeur">Valeur</th><th>Origine</th><th>Source</th></tr></thead><tbody>${lignes.join(
+  return `<div class="defilement"><table class="grandeurs origines"><thead><tr><th>Grandeur</th><th class="libelle">Libellé</th><th class="valeur">Valeur</th><th>Origine</th><th>Source</th></tr></thead><tbody>${lignes.join(
     ''
-  )}</tbody></table>`;
+  )}</tbody></table></div>`;
 }
 
 /** Libelle court d'un cas de vent pour le selecteur. */
