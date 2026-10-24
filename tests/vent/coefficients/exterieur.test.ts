@@ -20,7 +20,7 @@ describe('interpolation c_pe selon l aire chargee, figure 7.2', () => {
   });
 
   it('refuse une aire nulle', () => {
-    expect(() => cpeInterpole(A, 0)).toThrow('aire chargee');
+    expect(() => cpeInterpole(A, 0)).toThrow('aire chargée');
   });
 });
 
@@ -76,7 +76,7 @@ describe('toiture plate, tableau 7.2', () => {
   it('acrotere au-dela de 0,10 : valeurs de 0,10, avec avertissement', () => {
     const r = cpeToiturePlate('F', 0.2);
     expect(r.valeurs).toEqual([{ c_pe_10: -1.2, c_pe_1: -1.8 }]);
-    expect(r.avertissement).toContain('0,10');
+    expect(r.avertissement).toContain('0,1');
     expect(cpeToiturePlate('F', 0.1).avertissement).toBeNull();
   });
 });

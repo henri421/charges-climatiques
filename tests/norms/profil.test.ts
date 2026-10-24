@@ -23,13 +23,13 @@ describe('profil normatif', () => {
   });
 
   it('une valeur sans provenance BLOQUE le calcul', () => {
-    expect(() => verifierProfil(profilSansSource())).toThrow('n a pas de source');
+    expect(() => verifierProfil(profilSansSource())).toThrow("n'a pas de source");
   });
 
   it('une valeur non numerique bloque le calcul', () => {
     const p = ec1Recommande();
     p.neige.C_t = { valeur: Number.NaN, source: 'x' };
-    expect(() => verifierProfil(p)).toThrow('n a pas de valeur numerique');
+    expect(() => verifierProfil(p)).toThrow("n'a pas de valeur numérique");
   });
 
   it('une date mal formee est refusee', () => {
@@ -41,8 +41,8 @@ describe('profil normatif', () => {
   it('lit un profil JSON et le controle', () => {
     const p = profilDepuisJson(JSON.stringify(ec1Recommande()));
     expect(p.nom).toBe('Eurocode 1, valeurs recommandees');
-    expect(() => profilDepuisJson(JSON.stringify(profilSansSource()))).toThrow('n a pas de source');
+    expect(() => profilDepuisJson(JSON.stringify(profilSansSource()))).toThrow("n'a pas de source");
     expect(() => profilDepuisJson('{pas du json')).toThrow('JSON valide');
-    expect(() => profilDepuisJson('{"nom":"x"}')).toThrow('nom, date et perimetre');
+    expect(() => profilDepuisJson('{"nom":"x"}')).toThrow('nom, date et périmètre');
   });
 });

@@ -26,7 +26,7 @@ describe('verifierNeige', () => {
   });
 
   it('s_k absente BLOQUE le calcul', () => {
-    expect(() => verifierNeige(P, batimentCourant(), siteCourant({ s_k: null }))).toThrow('s_k n est pas renseignee');
+    expect(() => verifierNeige(P, batimentCourant(), siteCourant({ s_k: null }))).toThrow("s_k n'est pas renseignée");
   });
 
   it('deux versants : les trois cas sont rendus', () => {
@@ -63,7 +63,7 @@ describe('verifierNeige', () => {
 
   it('un obstacle declare produit son cas d accumulation', () => {
     const r = verifierNeige(P, batimentCourant(), siteCourant({ obstacles: [{ nom: 'edicule', hauteur: 1 }] }));
-    expect(r.cas.map((c) => c.nom)).toContain('Accumulation : edicule');
+    expect(r.cas.map((c) => c.nom)).toContain('Accumulation : édicule');
   });
 
   it('debord non demande : non applicable avec motif ; avertissement au-dessus de 800 m', () => {
@@ -72,7 +72,7 @@ describe('verifierNeige', () => {
     expect(bas.debord.motif).toContain('800 m');
     expect(bas.avertissements).toHaveLength(0);
     const haut = verifierNeige(P, batimentCourant(), siteCourant({ altitude: 1000 }));
-    expect(haut.avertissements.join(' ')).toContain('debord');
+    expect(haut.avertissements.join(' ')).toContain('débord');
   });
 
   it('debord demande : une charge par rive', () => {

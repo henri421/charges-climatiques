@@ -22,7 +22,7 @@ describe('vues', () => {
   it('le tableau d un cas porte le frottement non applicable et son motif', () => {
     const html = rendreCasDeVent(vent.cas[0]);
     expect(html).toContain('non applicable');
-    expect(html).toContain('negligeable');
+    expect(html).toContain('négligeable');
   });
 
   it('les provenances distinguent saisie et profil', () => {
@@ -32,7 +32,7 @@ describe('vues', () => {
   });
 
   it('sans aucun calcul, le tableau des provenances le dit', () => {
-    expect(tableauOrigines(P, null, null)).toContain('renseigner v_b,0 et s_k');
+    expect(tableauOrigines(P, null, null)).toContain('renseigner v<sub>b,0</sub> et s<sub>k</sub>');
   });
 
   it('la neige montre l arret de neige non applicable sur toiture plate', () => {
@@ -101,6 +101,6 @@ describe('export', () => {
     expect(html).toContain('Halle &lt;test&gt;');
     expect(html).toContain(P.nom);
     expect(html).toContain('<div class="dessin"><svg></svg></div>');
-    expect(html).toContain('constate, il ne prescrit pas');
+    expect(html).not.toContain('ne prescrit pas');
   });
 });

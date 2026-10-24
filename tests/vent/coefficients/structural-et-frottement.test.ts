@@ -36,7 +36,7 @@ describe('frottement, §7.5', () => {
     // b = 30, d = 12, h = 8 : paralleles 552 m2, perpendiculaires 480 m2
     const r = frottement(30, 12, 8, 0.934713, 'lisse');
     expect(r.applicable).toBe(false);
-    expect(r.motif).toContain('negligeable');
+    expect(r.motif).toContain('négligeable');
     expect(r.F_fr).toBeUndefined();
   });
 

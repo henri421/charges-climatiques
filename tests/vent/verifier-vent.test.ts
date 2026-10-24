@@ -96,7 +96,7 @@ describe('verifierVent, halle 30 x 12 x 8 m, toiture plate, categorie II', () =>
 
 describe('verifierVent, cas particuliers', () => {
   it('v_b,0 absente BLOQUE le calcul', () => {
-    expect(() => verifierVent(P, batimentCourant(), siteCourant({ v_b0: null }))).toThrow('v_b,0 n est pas renseignee');
+    expect(() => verifierVent(P, batimentCourant(), siteCourant({ v_b0: null }))).toThrow("v_b,0 n'est pas renseignée");
   });
 
   it('batiment eleve : bandes de hauteur de reference et q_p croissantes', () => {
@@ -154,7 +154,7 @@ describe('verifierVent, cas particuliers', () => {
 
   it('acrotere au-dela de h_p/h = 0,10 : avertissement porte au resultat', () => {
     const r = verifierVent(P, batimentCourant({ toiture: { type: 'plate', acrotere: 1.2 } }), siteCourant());
-    expect(r.avertissements.join(' ')).toContain('0,10');
+    expect(r.avertissements.join(' ')).toContain('0,1');
   });
 
   it('orographie saisie : c_o porte dans le resultat et signale', () => {

@@ -19,7 +19,7 @@ describe('dessin du zonage du vent', () => {
 
   it('chaque zone porte une info-bulle avec c_pe et w_net', () => {
     const svg = dessinCasDeVent(r.cas[0]);
-    expect(svg).toContain('<title>Zone D : c_pe = +0,76');
+    expect(svg).toContain('<title>Zone D : cpe = +0,76');
   });
 
   it('une zone a deux valeurs est neutre et affiche les deux', () => {
