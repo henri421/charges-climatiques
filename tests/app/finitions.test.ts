@@ -30,11 +30,9 @@ const TITRE = 'Charges climatiques';
 const lire = (chemin: string): string => readFileSync(fileURLToPath(new URL(chemin, import.meta.url)), 'utf8');
 const controler = (nom: string, html: string): string[] => constatsAffichage(texteVisible(html)).map((c) => `${nom} : ${c}`);
 
-const MODELES: ModeleSaisie[] = [
-  modeleParDefaut(),
-  { ...modeleParDefaut(), toiture: 'un-versant' },
-  { ...modeleParDefaut(), toiture: 'deux-versants' },
-];
+// v_b,0 et s_k sont vides par defaut (carte nationale) : renseignes ici.
+const SAISI: ModeleSaisie = { ...modeleParDefaut(), v_b0: 26, s_k: 0.65 };
+const MODELES: ModeleSaisie[] = [SAISI, { ...SAISI, toiture: 'un-versant' }, { ...SAISI, toiture: 'deux-versants' }];
 
 function sorties() {
   const ecran: string[] = [bandeauProfil(P)];
@@ -81,7 +79,7 @@ function sorties() {
         titre: 'Halle',
         date: '2026-10-24',
         profil: P.nom,
-        entrees: blocsDEntree(modeleParDefaut()),
+        entrees: blocsDEntree(SAISI),
         dessins: [],
         resultats: [...blocsVent(motif), ...blocsNeige(motif)],
         avertissements: avertissementsDeLaNote(motif, motif),

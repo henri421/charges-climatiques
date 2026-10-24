@@ -12,7 +12,7 @@ describe('dessin du zonage du vent', () => {
   it('rend un SVG avec les quatre parois et la toiture', () => {
     const svg = dessinCasDeVent(r.cas[0]);
     expect(svg.startsWith('<svg')).toBe(true);
-    for (const f of ['y- · au vent', 'y+ · sous le vent', 'x+ · laterale', 'x- · laterale', 'toiture · plan']) {
+    for (const f of ['y- · au vent', 'y+ · sous le vent', 'x+ · latérale', 'x- · latérale', 'toiture · plan']) {
       expect(svg).toContain(f);
     }
   });

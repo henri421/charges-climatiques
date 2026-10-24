@@ -63,7 +63,7 @@ describe('verifierNeige', () => {
 
   it('un obstacle declare produit son cas d accumulation', () => {
     const r = verifierNeige(P, batimentCourant(), siteCourant({ obstacles: [{ nom: 'edicule', hauteur: 1 }] }));
-    expect(r.cas.map((c) => c.nom)).toContain('Accumulation : édicule');
+    expect(r.cas.map((c) => c.nom)).toContain('Accumulation : edicule');
   });
 
   it('debord non demande : non applicable avec motif ; avertissement au-dessus de 800 m', () => {

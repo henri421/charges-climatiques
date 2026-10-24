@@ -16,11 +16,11 @@ describe('coefficient structural, §6.2', () => {
 
   it('aucun critere rempli : le module LEVE plutot que d extrapoler', () => {
     expect(() => coefficientStructural({ mode: 'dispense', ossatureAvecMursDeContreventement: false }, 20, 30)).toThrow(
-      'Aucun critere de dispense'
+      'Aucun critère de dispense'
     );
     // ossature mais h >= 4d
     expect(() => coefficientStructural({ mode: 'dispense', ossatureAvecMursDeContreventement: true }, 50, 12)).toThrow(
-      'Aucun critere de dispense'
+      'Aucun critère de dispense'
     );
   });
 

@@ -40,7 +40,7 @@ describe('profil normatif', () => {
 
   it('lit un profil JSON et le controle', () => {
     const p = profilDepuisJson(JSON.stringify(ec1Recommande()));
-    expect(p.nom).toBe('Eurocode 1, valeurs recommandees');
+    expect(p.nom).toBe('Eurocode 1, valeurs recommandées');
     expect(() => profilDepuisJson(JSON.stringify(profilSansSource()))).toThrow("n'a pas de source");
     expect(() => profilDepuisJson('{pas du json')).toThrow('JSON valide');
     expect(() => profilDepuisJson('{"nom":"x"}')).toThrow('nom, date et périmètre');

@@ -67,7 +67,7 @@ describe('blocs de sortie', () => {
 
   it('les charges en rive non applicables restent presentes avec leur motif', () => {
     const blocs = blocsNeige(neige);
-    const debord = blocs.find((b) => b.titre.startsWith('Neige en debord'));
+    const debord = blocs.find((b) => b.titre.startsWith('Neige en débord'));
     expect(debord?.note).toContain('Non applicable');
   });
 });
