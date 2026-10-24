@@ -21,7 +21,7 @@ const HAUT_TITRE = 34;
 const ROLES: Record<string, string> = {
   'au-vent': 'au vent',
   'sous-le-vent': 'sous le vent',
-  laterale: 'laterale',
+  laterale: 'latérale',
   toiture: 'toiture (plan)',
 };
 
@@ -95,7 +95,7 @@ function dessinerZones(face: Face, c: Cadre): string {
         largeurPx >= 12 && hauteurPx >= 14
           ? `<text class="zone-texte" x="${cx.toFixed(1)}" y="${(cy - (lignes.length - 1) * 7).toFixed(1)}">${lignes
               .map((l, i) => `<tspan x="${cx.toFixed(1)}" dy="${i === 0 ? 0 : 14}"${i === 0 ? ' class="zone-nom"' : ''}>${notationSvg(l)}</tspan>`)
-              .join('')}</text>`
+              .join(' ')}</text>`
           : '';
       return `<polygon class="${classeZone(z)}" points="${pts.join(' ')}"><title>${notationTexte(
         `Zone ${z.nom} : c_pe = ${texteCpeAffiche(z)}, w_net = ${texteWnetAffiche(z)} kN/m2`

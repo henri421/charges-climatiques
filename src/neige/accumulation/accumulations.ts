@@ -37,7 +37,7 @@ export function accumulationObstacle(
   s_k: number,
   facteur: number
 ): CasDeNeige {
-  const h = exigerPositif(obstacle.hauteur, `La hauteur de l obstacle « ${obstacle.nom} »`, 'm');
+  const h = exigerPositif(obstacle.hauteur, `La hauteur de l'obstacle « ${obstacle.nom} »`, 'm');
   const gamma = profil.neige.gamma_accumulation.valeur;
   const brut = (gamma * h) / s_k;
   const mu2 = borner(brut, profil.neige.mu_obstacle_min.valeur, profil.neige.mu_obstacle_max.valeur);
@@ -45,15 +45,15 @@ export function accumulationObstacle(
   const l_s = longueurAccumulation(profil, h);
   return {
     nom: `Accumulation : ${obstacle.nom}`,
-    description: `Accumulation contre l obstacle « ${obstacle.nom} » (h = ${nombreAffiche(h)} m)`,
+    description: `Accumulation contre l'obstacle « ${obstacle.nom} » (h = ${nombreAffiche(h)} m)`,
     clause: 'EN 1991-1-3 §6.2, figure 6.1',
     repere: 'depuis-obstacle',
     troncons: [troncon(0, l_s, mu2, m1, facteur)],
     intermediaires: [
       { symbole: 'gamma h / s_k', libelle: 'valeur brute de mu_2', valeur: brut, unite: '-' },
-      { symbole: 'mu_2', libelle: 'coefficient au pied de l obstacle, borne', valeur: mu2, unite: '-' },
+      { symbole: 'mu_2', libelle: "coefficient au pied de l'obstacle, borné", valeur: mu2, unite: '-' },
       { symbole: 'mu_1', libelle: 'coefficient courant', valeur: m1, unite: '-' },
-      { symbole: 'l_s', libelle: 'longueur d accumulation', valeur: l_s, unite: 'm' },
+      { symbole: 'l_s', libelle: "longueur d'accumulation", valeur: l_s, unite: 'm' },
     ],
   };
 }
@@ -83,7 +83,7 @@ export function accumulationToitureAdjacente(
   facteur: number,
   arretDeNeige: boolean
 ): CasDeNeige[] {
-  const h = exigerPositif(adj.difference, 'La difference de hauteur h avec la construction plus haute', 'm');
+  const h = exigerPositif(adj.difference, 'La différence de hauteur h avec la construction plus haute', 'm');
   const b1 = exigerPositifOuNul(adj.largeurHaute, 'La largeur b_1 de la toiture haute', 'm');
   exigerPositif(b2, 'La largeur b_2 de la toiture basse', 'm');
   const gamma = profil.neige.gamma_accumulation.valeur;
@@ -99,21 +99,21 @@ export function accumulationToitureAdjacente(
   const troncons = [troncon(0, fin, mu2, muFin, facteur)];
   if (b2 > l_s) troncons.push(troncon(l_s, b2, m1, m1, facteur));
   const inter = [
-    { symbole: 'h', libelle: 'difference de hauteur', valeur: h, unite: 'm' },
+    { symbole: 'h', libelle: 'différence de hauteur', valeur: h, unite: 'm' },
     { symbole: 'b_1', libelle: 'largeur de la toiture haute', valeur: b1, unite: 'm' },
     { symbole: 'b_2', libelle: 'largeur de la toiture basse', valeur: b2, unite: 'm' },
     { symbole: '(b_1+b_2)/2h', libelle: 'valeur brute de mu_w', valeur: mu_w_brut, unite: '-' },
     { symbole: 'gamma h / s_k', libelle: 'plafond de mu_w', valeur: plafond, unite: '-' },
-    { symbole: 'mu_w', libelle: 'coefficient du au vent, borne', valeur: mu_w, unite: '-' },
-    { symbole: 'mu_s', libelle: 'coefficient du au glissement', valeur: mu_s, unite: '-' },
+    { symbole: 'mu_w', libelle: 'coefficient dû au vent, borné', valeur: mu_w, unite: '-' },
+    { symbole: 'mu_s', libelle: 'coefficient dû au glissement', valeur: mu_s, unite: '-' },
     { symbole: 'mu_2', libelle: 'coefficient au pied du mur', valeur: mu2, unite: '-' },
-    { symbole: 'l_s', libelle: 'longueur d accumulation', valeur: l_s, unite: 'm' },
+    { symbole: 'l_s', libelle: "longueur d'accumulation", valeur: l_s, unite: 'm' },
   ];
   const clause = 'EN 1991-1-3 §5.3.6, figure 5.7';
   return [
     {
       nom: 'Toiture basse, cas (i)',
-      description: 'Toiture basse accolee, sans accumulation',
+      description: 'Toiture basse accolée, sans accumulation',
       clause,
       repere: 'depuis-obstacle',
       troncons: [troncon(0, b2, m1, m1, facteur)],
@@ -121,7 +121,7 @@ export function accumulationToitureAdjacente(
     },
     {
       nom: 'Toiture basse, cas (ii)',
-      description: 'Toiture basse accolee, accumulation au pied du mur',
+      description: 'Toiture basse accolée, accumulation au pied du mur',
       clause,
       repere: 'depuis-obstacle',
       troncons,

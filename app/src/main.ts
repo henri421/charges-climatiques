@@ -223,7 +223,7 @@ function rafraichir(): void {
 // --- Sorties --------------------------------------------------------------------
 
 function sansCalcul(): void {
-  montrer(zones.erreurSaisie, 'Aucun calcul a exporter : corriger la saisie, puis reessayer.');
+  montrer(zones.erreurSaisie, 'Aucun calcul à exporter : corriger la saisie, puis réessayer.');
 }
 
 /**

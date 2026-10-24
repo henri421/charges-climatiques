@@ -154,7 +154,7 @@ function facesDeLaDirection(
 
   // Toiture plate : zones F, G, H, I dans le repere du vent, z_e = h.
   if (batiment.toiture.type === 'plate') {
-    const hp_h = exigerPositifOuNul(batiment.toiture.acrotere, 'La hauteur d acrotere h_p', 'm') / h;
+    const hp_h = exigerPositifOuNul(batiment.toiture.acrotere, "La hauteur d'acrotère h_p", 'm') / h;
     const zones = zonesToiturePlate(e, b, d).map((r) => {
       const c = cpeToiturePlate(r.nom, hp_h);
       if (c.avertissement !== null) avertissements.add(c.avertissement);
@@ -174,7 +174,7 @@ function cpeAuDroitDe(face: Face, abscisse: number): number {
       return z.valeurs[0].c_pe;
     }
   }
-  throw new Error(`L abscisse des ouvertures (${nombreAffiche(abscisse)} m) sort de la face ${face.nom}.`);
+  throw new Error(`L'abscisse des ouvertures (${nombreAffiche(abscisse)} m) sort de la face ${face.nom}.`);
 }
 
 /** Complete les pressions nettes d'une face pour une pression interieure w_i. */
@@ -197,14 +197,14 @@ export function verifierVent(
   verifierProfil(profil);
   if (site.v_b0 === null) {
     throw new Error(
-      'La vitesse de reference de base v_b,0 n est pas renseignee. Elle vient de la carte de l annexe ' +
-        'nationale au lieu de construction : sans elle, aucune action du vent ne peut etre calculee.'
+      "La vitesse de référence de base v_b,0 n'est pas renseignée. Elle vient de la carte de l'annexe " +
+        'nationale au lieu de construction : sans elle, aucune action du vent ne peut être calculée.'
     );
   }
-  exigerPositif(batiment.longueur, 'La longueur du batiment', 'm');
-  exigerPositif(batiment.largeur, 'La largeur du batiment', 'm');
-  const h = exigerPositif(batiment.hauteur, 'La hauteur h du batiment', 'm');
-  if (options.aireChargee !== null) exigerPositif(options.aireChargee, 'L aire chargee', 'm2');
+  exigerPositif(batiment.longueur, 'La longueur du bâtiment', 'm');
+  exigerPositif(batiment.largeur, 'La largeur du bâtiment', 'm');
+  const h = exigerPositif(batiment.hauteur, 'La hauteur h du bâtiment', 'm');
+  if (options.aireChargee !== null) exigerPositif(options.aireChargee, "L'aire chargée", 'm2');
 
   const origines: Record<string, Origine> = {
     v_b0: 'saisi',
@@ -214,7 +214,7 @@ export function verifierVent(
     k_I: 'profil',
     c_o: site.orographie.mode === 'saisi' ? 'saisi' : 'defaut-recommande',
   };
-  const c_o = site.orographie.mode === 'saisi' ? exigerPositif(site.orographie.c_o, 'Le coefficient d orographie c_o', '-') : 1;
+  const c_o = site.orographie.mode === 'saisi' ? exigerPositif(site.orographie.c_o, "Le coefficient d'orographie c_o", '-') : 1;
   const v_b = vitesseDeReference(site.v_b0, profil.vent.c_dir.valeur, profil.vent.c_season.valeur);
   const parametres: ParametresPression = {
     categorie: site.categorieTerrain,
@@ -234,12 +234,12 @@ export function verifierVent(
     toiture = {
       applicable: false,
       motif:
-        'Toitures inclinees (tableaux 7.3 et 7.4) : zonage non implemente dans cette version. ' +
-        'La toiture subit bien une action du vent, a determiner par ailleurs.',
+        'Toitures inclinées (tableaux 7.3 et 7.4) : zonage non implémenté dans cette version. ' +
+        'La toiture subit bien une action du vent, à déterminer par ailleurs.',
     };
     avertissements.add(
-      'Toiture inclinee : seules les parois verticales sont traitees, dessinees jusqu a la hauteur h ' +
-        '(pignons comptes en rectangle, du cote de la securite).'
+      'Toiture inclinée : seules les parois verticales sont traitées, dessinées jusqu\'à la hauteur h ' +
+        '(pignons comptés en rectangle, du côté de la sécurité).'
     );
   }
 

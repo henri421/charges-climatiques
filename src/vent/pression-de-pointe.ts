@@ -14,7 +14,7 @@ const N_PAR_KN = 1000;
 
 /** Vitesse de reference v_b = c_dir c_season v_b,0, expression (4.1). */
 export function vitesseDeReference(v_b0: number, c_dir: number, c_season: number): number {
-  exigerPositif(v_b0, 'La vitesse de reference de base v_b,0', 'm/s');
+  exigerPositif(v_b0, 'La vitesse de référence de base v_b,0', 'm/s');
   return c_dir * c_season * v_b0;
 }
 

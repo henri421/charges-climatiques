@@ -79,16 +79,16 @@ export function verifierProfil(profil: ProfilNormatif): void {
     throw new Error('Le profil normatif doit porter un nom.');
   }
   if (!/^\d{4}-\d{2}-\d{2}$/.test(profil.date)) {
-    throw new Error(`La date du profil « ${profil.nom} » doit etre au format AAAA-MM-JJ.`);
+    throw new Error(`La date du profil « ${profil.nom} » doit être au format AAAA-MM-JJ.`);
   }
   for (const [famille, valeurs] of Object.entries({ vent: profil.vent, neige: profil.neige })) {
     for (const [nom, v] of Object.entries(valeurs as Record<string, ValeurSourcee>)) {
       if (v === undefined || v === null || !Number.isFinite(v.valeur)) {
-        throw new Error(`Profil « ${profil.nom} » : ${famille}.${nom} n a pas de valeur numerique.`);
+        throw new Error(`Profil « ${profil.nom} » : ${famille}.${nom} n'a pas de valeur numérique.`);
       }
       if (typeof v.source !== 'string' || v.source.trim() === '') {
         throw new Error(
-          `Profil « ${profil.nom} » : ${famille}.${nom} n a pas de source. ` +
+          `Profil « ${profil.nom} » : ${famille}.${nom} n'a pas de source. ` +
             'Une valeur de provenance inconnue bloque le calcul.'
         );
       }
@@ -105,14 +105,14 @@ export function profilDepuisJson(texte: string): ProfilNormatif {
   try {
     brut = JSON.parse(texte);
   } catch {
-    throw new Error('Le profil normatif n est pas un JSON valide.');
+    throw new Error("Le profil normatif n'est pas un JSON valide.");
   }
   if (typeof brut !== 'object' || brut === null) {
-    throw new Error('Le profil normatif doit etre un objet JSON.');
+    throw new Error('Le profil normatif doit être un objet JSON.');
   }
   const p = brut as ProfilNormatif;
   if (typeof p.nom !== 'string' || typeof p.date !== 'string' || typeof p.perimetre !== 'string') {
-    throw new Error('Le profil normatif doit porter nom, date et perimetre.');
+    throw new Error('Le profil normatif doit porter nom, date et périmètre.');
   }
   if (typeof p.vent !== 'object' || typeof p.neige !== 'object' || p.vent === null || p.neige === null) {
     throw new Error('Le profil normatif doit porter les familles vent et neige.');
@@ -124,7 +124,7 @@ export function profilDepuisJson(texte: string): ProfilNormatif {
 /** Valeur strictement positive et finie, sinon erreur nommant la grandeur. */
 export function exigerPositif(valeur: number, nom: string, unite: string): number {
   if (!Number.isFinite(valeur) || valeur <= 0) {
-    throw new Error(`${nom} doit etre un nombre strictement positif (${unite}).`);
+    throw new Error(`${nom} doit être un nombre strictement positif (${unite}).`);
   }
   return valeur;
 }
@@ -132,7 +132,7 @@ export function exigerPositif(valeur: number, nom: string, unite: string): numbe
 /** Valeur positive ou nulle et finie, sinon erreur nommant la grandeur. */
 export function exigerPositifOuNul(valeur: number, nom: string, unite: string): number {
   if (!Number.isFinite(valeur) || valeur < 0) {
-    throw new Error(`${nom} doit etre un nombre positif ou nul (${unite}).`);
+    throw new Error(`${nom} doit être un nombre positif ou nul (${unite}).`);
   }
   return valeur;
 }

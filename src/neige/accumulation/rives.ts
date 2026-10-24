@@ -24,7 +24,7 @@ export function chargeDeDebord(nomRive: string, s: number, gamma: number): Charg
   const k = Math.min(3 / d, d * gamma);
   const s_e = (k * s * s) / gamma;
   return {
-    nom: `Debord, rive ${nomRive}`,
+    nom: `Débord, rive ${nomRive}`,
     clause: 'EN 1991-1-3 §6.3, expression (6.4)',
     valeur: s_e,
     detail: `s = ${nombreAffiche(s)} kN/m2, d = ${nombreAffiche(d)} m, k = ${nombreAffiche(k)}`,
@@ -39,12 +39,12 @@ export function chargeDeDebord(nomRive: string, s: number, gamma: number): Charg
  * le dispositif suivant (m).
  */
 export function effortArretDeNeige(nomVersant: string, s: number, b: number, alpha: number): ChargeLineique {
-  exigerPositif(b, 'La distance horizontale b au faitage', 'm');
+  exigerPositif(b, 'La distance horizontale b au faîtage', 'm');
   const F_s = s * b * Math.sin((alpha * Math.PI) / 180);
   return {
-    nom: `Arret de neige, versant ${nomVersant}`,
+    nom: `Arrêt de neige, versant ${nomVersant}`,
     clause: 'EN 1991-1-3 §6.4, expression (6.5)',
     valeur: F_s,
-    detail: `s = ${nombreAffiche(s)} kN/m2, b = ${nombreAffiche(b, 2)} m, alpha = ${nombreAffiche(alpha)} degres`,
+    detail: `s = ${nombreAffiche(s)} kN/m2, b = ${nombreAffiche(b, 2)} m, alpha = ${nombreAffiche(alpha)} degrés`,
   };
 }

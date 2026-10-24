@@ -60,7 +60,7 @@ export function casSansAccumulation(
     return [
       {
         nom: 'Cas (i)',
-        description: `Toiture a un versant, alpha = ${nombreAffiche(toiture.pente)} degres`,
+        description: `Toiture à un versant, alpha = ${nombreAffiche(toiture.pente)} degrés`,
         clause: 'EN 1991-1-3 §5.3.3, figure 5.2',
         repere: 'toiture',
         troncons: [troncon(0, largeur, m, m, facteur)],
@@ -72,7 +72,7 @@ export function casSansAccumulation(
   const { pente1, pente2 } = toiture;
   for (const [nom, a] of [['pente1', pente1], ['pente2', pente2]] as const) {
     if (!Number.isFinite(a) || a <= 0 || a >= 90) {
-      throw new Error(`La ${nom} d une toiture a deux versants doit etre comprise entre 0 et 90 degres exclus (degres).`);
+      throw new Error(`La ${nom} d'une toiture à deux versants doit être comprise entre 0 et 90 degrés exclus (degrés).`);
     }
   }
   const m1 = mu1(pente1, arretDeNeige);
@@ -95,7 +95,7 @@ export function casSansAccumulation(
     },
     {
       nom: 'Cas (ii)',
-      description: 'Deux versants, versant y- a demi-charge',
+      description: 'Deux versants, versant y- à demi-charge',
       clause,
       repere: 'toiture',
       troncons: [troncon(0, w1, 0.5 * m1, 0.5 * m1, facteur), troncon(w1, largeur, m2, m2, facteur)],
@@ -103,7 +103,7 @@ export function casSansAccumulation(
     },
     {
       nom: 'Cas (iii)',
-      description: 'Deux versants, versant y+ a demi-charge',
+      description: 'Deux versants, versant y+ à demi-charge',
       clause,
       repere: 'toiture',
       troncons: [troncon(0, w1, m1, m1, facteur), troncon(w1, largeur, 0.5 * m2, 0.5 * m2, facteur)],

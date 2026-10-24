@@ -44,13 +44,13 @@ export function verifierNeige(profil: ProfilNormatif, batiment: Batiment, site: 
   verifierProfil(profil);
   if (site.s_k === null) {
     throw new Error(
-      'La charge de neige au sol s_k n est pas renseignee. Elle vient de la carte de l annexe ' +
-        'nationale au lieu de construction : sans elle, aucune charge de neige ne peut etre calculee.'
+      "La charge de neige au sol s_k n'est pas renseignée. Elle vient de la carte de l'annexe " +
+        'nationale au lieu de construction : sans elle, aucune charge de neige ne peut être calculée.'
     );
   }
   const s_k = exigerPositif(site.s_k, 'La charge de neige au sol s_k', 'kN/m2');
-  const largeur = exigerPositif(batiment.largeur, 'La largeur du batiment', 'm');
-  const longueur = exigerPositif(batiment.longueur, 'La longueur du batiment', 'm');
+  const largeur = exigerPositif(batiment.largeur, 'La largeur du bâtiment', 'm');
+  const longueur = exigerPositif(batiment.longueur, 'La longueur du bâtiment', 'm');
 
   const C_e = coefficientExposition(profil, site.topographieNeige);
   const C_t = coefficientThermique(profil, site.C_t);
@@ -70,8 +70,8 @@ export function verifierNeige(profil: ProfilNormatif, batiment: Batiment, site: 
     const b2 = adj.face === 'y-' || adj.face === 'y+' ? largeur : longueur;
     if (batiment.toiture.type !== 'plate') {
       avertissements.push(
-        'Le §5.3.6 vise une toiture basse de faible pente : la toiture etudiee etant inclinee, ' +
-          'le cas d accumulation est rendu mais son domaine d emploi est a confirmer.'
+        'Le §5.3.6 vise une toiture basse de faible pente : la toiture étudiée étant inclinée, ' +
+          "le cas d'accumulation est rendu mais son domaine d'emploi est à confirmer."
       );
     }
     cas.push(...accumulationToitureAdjacente(profil, adj, b2, s_k, facteur, site.arretDeNeige));
@@ -89,19 +89,19 @@ export function verifierNeige(profil: ProfilNormatif, batiment: Batiment, site: 
     if (sFin > 0) charges.push(chargeDeDebord('y+', sFin, gamma));
     debord = {
       applicable: charges.length > 0,
-      motif: charges.length > 0 ? 'Debord demande (§6.3).' : 'Charge nulle en rive : aucun debord.',
+      motif: charges.length > 0 ? 'Débord demandé (§6.3).' : 'Charge nulle en rive : aucun débord.',
       charges,
     };
   } else {
     debord = {
       applicable: false,
-      motif: 'Non demande. Le §6.3(1) recommande de le considerer pour les sites au-dessus de 800 m.',
+      motif: 'Non demandé. Le §6.3(1) recommande de le considérer pour les sites au-dessus de 800 m.',
       charges: [],
     };
     if (site.altitude > ALTITUDE_DEBORD) {
       avertissements.push(
-        `Site a ${nombreAffiche(site.altitude)} m : au-dessus de ${ALTITUDE_DEBORD} m, le §6.3(1) recommande de ` +
-          'considerer la neige en debord de rive, qui n a pas ete demandee.'
+        `Site à ${nombreAffiche(site.altitude)} m : au-dessus de ${ALTITUDE_DEBORD} m, le §6.3(1) recommande de ` +
+          "considérer la neige en débord de rive, qui n'a pas été demandée."
       );
     }
   }
@@ -111,7 +111,7 @@ export function verifierNeige(profil: ProfilNormatif, batiment: Batiment, site: 
   let arretDeNeige: ResultatNeige['arretDeNeige'];
   const t = batiment.toiture;
   if (!site.arretDeNeige) {
-    arretDeNeige = { applicable: false, motif: 'Aucun dispositif d arret de neige declare.', charges: [] };
+    arretDeNeige = { applicable: false, motif: "Aucun dispositif d'arrêt de neige déclaré.", charges: [] };
   } else if (t.type === 'plate') {
     arretDeNeige = {
       applicable: false,
@@ -124,7 +124,7 @@ export function verifierNeige(profil: ProfilNormatif, batiment: Batiment, site: 
       applicable: t.pente > 0,
       motif:
         t.pente > 0
-          ? 'Dispositif en egout, b = largeur en plan du versant.'
+          ? "Dispositif en égout, b = largeur en plan du versant."
           : 'Pente nulle : aucun glissement, effort sans objet.',
       charges: t.pente > 0 ? [effortArretDeNeige('unique', s, largeur, t.pente)] : [],
     };
@@ -134,7 +134,7 @@ export function verifierNeige(profil: ProfilNormatif, batiment: Batiment, site: 
     const s2 = Math.max(...sansAccumulation.map((c) => chargeMaxSur(c, w1, largeur)));
     arretDeNeige = {
       applicable: true,
-      motif: 'Dispositifs en egout de chaque versant, b = largeur en plan du versant.',
+      motif: "Dispositifs en égout de chaque versant, b = largeur en plan du versant.",
       charges: [effortArretDeNeige('y-', s1, w1, t.pente1), effortArretDeNeige('y+', s2, w2, t.pente2)],
     };
   }

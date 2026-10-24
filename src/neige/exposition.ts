@@ -36,7 +36,7 @@ export function coefficientThermique(profil: ProfilNormatif, saisi: number | nul
   }
   exigerPositif(saisi, 'Le coefficient thermique C_t', '-');
   if (saisi > 1) {
-    throw new Error('Le coefficient thermique C_t ne peut pas depasser 1 (EN 1991-1-3 §5.2(8)).');
+    throw new Error('Le coefficient thermique C_t ne peut pas dépasser 1 (EN 1991-1-3 §5.2(8)).');
   }
-  return { valeur: saisi, origine: 'saisi', source: 'saisie de l utilisateur, justification hors outil' };
+  return { valeur: saisi, origine: 'saisi', source: "saisie de l'utilisateur, justification hors outil" };
 }

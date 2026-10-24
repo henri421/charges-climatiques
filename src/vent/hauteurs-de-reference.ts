@@ -27,8 +27,8 @@ export interface Bande {
  * reste du cote de la securite (z_e = sommet de chaque bande).
  */
 export function bandesDeHauteur(h: number, b: number): Bande[] {
-  if (!Number.isFinite(h) || h <= 0) throw new Error('La hauteur h doit etre un nombre strictement positif (m).');
-  if (!Number.isFinite(b) || b <= 0) throw new Error('La largeur b doit etre un nombre strictement positif (m).');
+  if (!Number.isFinite(h) || h <= 0) throw new Error('La hauteur h doit être un nombre strictement positif (m).');
+  if (!Number.isFinite(b) || b <= 0) throw new Error('La largeur b doit être un nombre strictement positif (m).');
   if (h <= b) return [{ z_bas: 0, z_haut: h, z_e: h }];
   if (h <= 2 * b) {
     return [

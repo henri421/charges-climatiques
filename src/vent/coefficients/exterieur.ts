@@ -23,7 +23,7 @@ export interface PaireCpe {
  */
 export function cpeInterpole(paire: PaireCpe, aire: number): number {
   if (!Number.isFinite(aire) || aire <= 0) {
-    throw new Error('L aire chargee A doit etre un nombre strictement positif (m2).');
+    throw new Error("L'aire chargée A doit être un nombre strictement positif (m2).");
   }
   if (aire <= 1) return paire.c_pe_1;
   if (aire >= 10) return paire.c_pe_10;
@@ -62,12 +62,12 @@ function paire(v: [number, number]): PaireCpe {
  */
 export function cpeParoi(zone: ZoneParoi, hd: number): PaireCpe {
   if (!Number.isFinite(hd) || hd <= 0) {
-    throw new Error('Le rapport h/d doit etre un nombre strictement positif (-).');
+    throw new Error('Le rapport h/d doit être un nombre strictement positif (-).');
   }
   if (hd > 5) {
     throw new Error(
-      `h/d = ${nombreAffiche(hd, 2)} > 5 : le tableau 7.1 ne s applique plus, la norme renvoie aux ` +
-        'coefficients de force (§7.6 a §7.8), hors perimetre de cet outil.'
+      `h/d = ${nombreAffiche(hd, 2)} > 5 : le tableau 7.1 ne s'applique plus, la norme renvoie aux ` +
+        'coefficients de force (§7.6 à §7.8), hors périmètre de cet outil.'
     );
   }
   const [l5, l1, l025] = TABLEAU_7_1;
@@ -109,7 +109,7 @@ export interface CpeToiturePlate {
  */
 export function cpeToiturePlate(zone: ZoneToiturePlate, hp_h: number): CpeToiturePlate {
   if (!Number.isFinite(hp_h) || hp_h < 0) {
-    throw new Error('Le rapport h_p/h doit etre un nombre positif ou nul (-).');
+    throw new Error('Le rapport h_p/h doit être un nombre positif ou nul (-).');
   }
   if (zone === 'I') {
     return {
@@ -128,7 +128,7 @@ export function cpeToiturePlate(zone: ZoneToiturePlate, hp_h: number): CpeToitur
       hp_h: dernier.hp_h,
       avertissement:
         hp_h > dernier.hp_h
-          ? `h_p/h = ${nombreAffiche(hp_h)} > 0,1 : valeurs du tableau 7.2 pour h_p/h = 0,1 retenues, du cote de la securite.`
+          ? `h_p/h = ${nombreAffiche(hp_h)} > 0,1 : valeurs du tableau 7.2 pour h_p/h = 0,1 retenues, du côté de la sécurité.`
           : null,
     };
   }

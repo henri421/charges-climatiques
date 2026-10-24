@@ -85,8 +85,8 @@ export function dessinCasDeNeige(cas: CasDeNeige, toiture: Toiture, sMax: number
   const hauteur = yBase + 12 + HAUT_TOITURE + 26;
   const legende =
     cas.repere === 'toiture'
-      ? `x de 0 (rive y-) a ${aff(longueur, 2)} m`
-      : `x depuis le mur ou l obstacle, jusqu a ${aff(longueur, 2)} m`;
+      ? `x de 0 (rive y-) à ${aff(longueur, 2)} m`
+      : `x depuis le mur ou l'obstacle, jusqu'à ${aff(longueur, 2)} m`;
   return `<svg class="schema-neige" viewBox="0 0 ${LARGEUR_SVG} ${hauteur.toFixed(0)}" role="img" aria-label="${notationTexte(
     cas.nom
   )}"><text class="titre" x="${MARGE}" y="${MARGE}">${notationSvg(`${cas.nom} — ${cas.description}`)}</text>${poly}<line class="base" x1="${X(0)}" y1="${Y(0)}" x2="${X(longueur)}" y2="${Y(0)}"/>${etiquettes.join('')}${support}<text class="legende" x="${MARGE}" y="${(hauteur - 8).toFixed(1)}">${notationSvg(

@@ -9,15 +9,15 @@
 
 import type { ProfilNormatif } from './profil';
 
-const EN_1991_1_3 = 'EN 1991-1-3:2003, valeur recommandee';
-const EN_1991_1_4 = 'EN 1991-1-4:2005, valeur recommandee';
+const EN_1991_1_3 = 'EN 1991-1-3:2003, valeur recommandée';
+const EN_1991_1_4 = 'EN 1991-1-4:2005, valeur recommandée';
 
 export function ec1Recommande(): ProfilNormatif {
   return {
-    nom: 'Eurocode 1, valeurs recommandees',
+    nom: 'Eurocode 1, valeurs recommandées',
     date: '2026-10-01',
     perimetre:
-      'Valeurs recommandees de l EN 1991-1-3 et de l EN 1991-1-4, sans annexe nationale. ' +
+      "Valeurs recommandées de l'EN 1991-1-3 et de l'EN 1991-1-4, sans annexe nationale. " +
       'Ni s_k ni v_b,0 : ces grandeurs se saisissent.',
     vent: {
       c_dir: { valeur: 1.0, source: `${EN_1991_1_4}, §4.2(2) note 2` },

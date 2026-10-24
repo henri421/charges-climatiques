@@ -35,8 +35,8 @@ export function cpiEnveloppe(profil: ProfilNormatif): ValeurCpi[] {
 export function cpiFaceDominante(rapport: number, c_pe: number): ValeurCpi {
   if (!Number.isFinite(rapport) || rapport < 2) {
     throw new Error(
-      'Le rapport des aires d ouvertures doit valoir au moins 2 pour qu une face soit dominante ' +
-        '(EN 1991-1-4 §7.2.9(5)). En deca, choisir l enveloppe de pression interieure.'
+      "Le rapport des aires d'ouvertures doit valoir au moins 2 pour qu'une face soit dominante " +
+        "(EN 1991-1-4 §7.2.9(5)). En deçà, choisir l'enveloppe de pression intérieure."
     );
   }
   const facteur = rapport >= 3 ? 0.9 : 0.75 + 0.15 * (rapport - 2);

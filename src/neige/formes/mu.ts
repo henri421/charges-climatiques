@@ -25,7 +25,7 @@ export function palierMu1(alpha: number): PalierMu1 {
  */
 export function mu1(alpha: number, arretDeNeige: boolean): number {
   if (!Number.isFinite(alpha) || alpha < 0 || alpha >= 90) {
-    throw new Error('La pente de toiture alpha doit etre comprise entre 0 et 90 degres exclus (degres).');
+    throw new Error('La pente de toiture alpha doit être comprise entre 0 et 90 degrés exclus (degrés).');
   }
   if (arretDeNeige) return 0.8;
   if (alpha <= 30) return 0.8;

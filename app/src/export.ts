@@ -9,12 +9,12 @@ import { JETONS, notationHtml, type BlocResultat } from 'aedificium-ui';
 
 /** Hypotheses et limites rappelees dans la note de calcul. */
 export const HYPOTHESES: string[] = [
-  'Batiment a base rectangulaire ; methode de la pression de pointe (EN 1991-1-4 §4.5).',
-  'Hauteur de reference des parois laterales, sous le vent et de la toiture : z_e = h. Pression interieure a z_i = h.',
-  'Bandes intermediaires de la face au vent de hauteur au plus b, a z_e = leur sommet.',
-  'Zonage au vent des toitures inclinees non traite dans cette version.',
-  'Neige : situations durables et transitoires ; neige exceptionnelle hors perimetre.',
-  'Valeurs recommandees de l Eurocode, sauf grandeurs de base saisies ; aucune annexe nationale codee.',
+  'Bâtiment à base rectangulaire ; méthode de la pression de pointe (EN 1991-1-4 §4.5).',
+  'Hauteur de référence des parois latérales, sous le vent et de la toiture : z_e = h. Pression intérieure à z_i = h.',
+  'Bandes intermédiaires de la face au vent de hauteur au plus b, à z_e = leur sommet.',
+  'Zonage au vent des toitures inclinées non traité dans cette version.',
+  'Neige : situations durables et transitoires ; neige exceptionnelle hors périmètre.',
+  "Valeurs recommandées de l'Eurocode, sauf grandeurs de base saisies ; aucune annexe nationale codée.",
 ];
 
 /**
@@ -109,7 +109,7 @@ export function noteDeCalculHtml(note: NoteDeCalcul, styles: string): string {
   const hypotheses =
     note.hypotheses.length === 0
       ? ''
-      : `<h2>Hypotheses et limites</h2><ul>${note.hypotheses.map((h) => `<li>${notationHtml(h)}</li>`).join('')}</ul>`;
+      : `<h2>Hypothèses et limites</h2><ul>${note.hypotheses.map((h) => `<li>${notationHtml(h)}</li>`).join('')}</ul>`;
   return `<!doctype html>
 <html lang="fr"><head><meta charset="utf-8" />
 <title>Note de calcul — ${notationHtml(note.titre)}</title>
@@ -118,9 +118,9 @@ export function noteDeCalculHtml(note: NoteDeCalcul, styles: string): string {
 <h1>Note de calcul — actions climatiques (EN 1991-1-3, EN 1991-1-4)</h1>
 <p class="date">${notationHtml(note.titre)} · ${notationHtml(note.date)} · profil : ${notationHtml(note.profil)}</p>
 ${avertissements}
-<h2>Donnees d entree</h2>${note.entrees.map(tableDuBloc).join('')}
+<h2>Données d'entrée</h2>${note.entrees.map(tableDuBloc).join('')}
 <h2>Zonage et cas de charge</h2>${dessins}
-<h2>Actions caracteristiques</h2>${note.resultats.map(tableDuBloc).join('')}
+<h2>Actions caractéristiques</h2>${note.resultats.map(tableDuBloc).join('')}
 ${hypotheses}
 <p class="pied">${AIDE_AU_CALCUL}</p>
 </body></html>`;
