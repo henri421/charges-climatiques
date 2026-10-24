@@ -58,11 +58,9 @@ export interface NoteDeCalcul {
   hypotheses: string[];
 }
 
-const AIDE_AU_CALCUL =
-  "Outil d'aide au calcul. Cet outil constate, il ne prescrit pas. Les actions climatiques " +
-  "dependent de l'annexe nationale en vigueur au lieu de construction ; il appartient a " +
-  "l'ingenieur de verifier que le profil actif correspond au texte applicable a son projet. " +
-  "Cette note est un compte rendu, pas une justification reglementaire signee.";
+const AVERTISSEMENT_NOTE =
+  "Les actions climatiques dépendent de l'annexe nationale en vigueur au lieu de construction : " +
+  "vérifier que le profil actif, rappelé en tête de cette note, correspond au texte applicable au projet.";
 
 const STYLE_NOTE = `
   body { margin: 0; padding: 24px 28px; background: var(--surface); color: var(--texte); font: 14px/1.5 var(--sans); }
@@ -122,6 +120,6 @@ ${avertissements}
 <h2>Zonage et cas de charge</h2>${dessins}
 <h2>Actions caractéristiques</h2>${note.resultats.map(tableDuBloc).join('')}
 ${hypotheses}
-<p class="pied">${AIDE_AU_CALCUL}</p>
+<p class="pied">${AVERTISSEMENT_NOTE}</p>
 </body></html>`;
 }
