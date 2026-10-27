@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { JETONS, valeursDesJetons } from 'aedificium-ui';
 import { ec1Recommande, verifierNeige, verifierVent } from '../../src/index';
 import { blocsNeige, blocsVent, lignesZones, rendreCasDeVent, rendreNeige, tableauOrigines } from '../../app/src/vue';
-import { STYLES_TRACE, noteDeCalculHtml } from '../../app/src/export';
+import { STYLES_TRACE } from '../../app/src/export';
 import { batimentCourant, siteCourant } from '../fixtures';
 
 const P = ec1Recommande();
@@ -82,25 +82,5 @@ describe('export', () => {
   it('STYLES_TRACE porte les regles de peinture des zones', () => {
     expect(STYLES_TRACE).toContain('svg .zone-depression');
     expect(STYLES_TRACE).toContain('svg .charge');
-  });
-
-  it('la note porte le profil, les dessins et echappe le texte', () => {
-    const html = noteDeCalculHtml(
-      {
-        titre: 'Halle <test>',
-        date: '2026-10-01',
-        profil: P.nom,
-        entrees: [],
-        dessins: ['<svg></svg>'],
-        resultats: blocsVent(vent),
-        avertissements: ['attention'],
-        hypotheses: ['h1'],
-      },
-      STYLES_TRACE
-    );
-    expect(html).toContain('Halle &lt;test&gt;');
-    expect(html).toContain(P.nom);
-    expect(html).toContain('<div class="dessin"><svg></svg></div>');
-    expect(html).not.toContain('ne prescrit pas');
   });
 });

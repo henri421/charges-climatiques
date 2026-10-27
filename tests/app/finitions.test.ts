@@ -7,11 +7,10 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { NOMS_GRECS, blocsEnTexte, constatsAffichage, contenuBalise, notationHtml, resultatsEnCsv, texteVisible } from 'aedificium-ui';
+import { NOMS_GRECS, blocsEnTexte, constatsAffichage, contenuBalise, noteDeCalculHtml, notationHtml, resultatsEnCsv, texteVisible } from 'aedificium-ui';
 import { ec1Recommande, verifierNeige, verifierVent } from '../../src/index';
 import { aireChargeeDepuisModele, batimentDepuisModele, modeleParDefaut, siteDepuisModele, type ModeleSaisie } from '../../app/src/form';
 import {
-  avertissementsDeLaNote,
   bandeauProfil,
   blocsDEntree,
   blocsNeige,
@@ -23,7 +22,8 @@ import {
 } from '../../app/src/vue';
 import { dessinCasDeVent } from '../../app/src/dessin-vent';
 import { chargeMaximale, dessinCasDeNeige } from '../../app/src/dessin-neige';
-import { HYPOTHESES, STYLES_TRACE, noteDeCalculHtml } from '../../app/src/export';
+import { STYLES_TRACE } from '../../app/src/export';
+import { noteDuCalcul } from '../../app/src/note';
 
 const P = ec1Recommande();
 const TITRE = 'Charges climatiques';
@@ -32,6 +32,7 @@ const controler = (nom: string, html: string): string[] => constatsAffichage(tex
 
 // v_b,0 et s_k sont vides par defaut (carte nationale) : renseignes ici.
 const SAISI: ModeleSaisie = { ...modeleParDefaut(), v_b0: 26, s_k: 0.65 };
+const CARTOUCHE = { projet: 'Halle', element: '', date: '2026-10-24' };
 const MODELES: ModeleSaisie[] = [SAISI, { ...SAISI, toiture: 'un-versant' }, { ...SAISI, toiture: 'deux-versants' }];
 
 function sorties() {
@@ -53,41 +54,13 @@ function sorties() {
       rendreAvertissements([...vent.avertissements, ...neige.avertissements])
     );
     const resultats = [...blocsVent(vent), ...blocsNeige(neige)];
-    notes.push(
-      noteDeCalculHtml(
-        {
-          titre: 'Halle',
-          date: '2026-10-24',
-          profil: P.nom,
-          entrees: blocsDEntree(m),
-          dessins,
-          resultats,
-          avertissements: avertissementsDeLaNote(vent, neige),
-          hypotheses: HYPOTHESES,
-        },
-        STYLES_TRACE
-      )
-    );
+    notes.push(noteDeCalculHtml(noteDuCalcul(P, m, vent, neige, CARTOUCHE), STYLES_TRACE));
     csv.push(resultatsEnCsv(blocsEnTexte([...blocsDEntree(m), ...resultats])));
   }
   // Calcul impossible : la note porte le motif a la place du resultat.
   const motif = 'v_b,0 non renseignée';
   ecran.push(tableauOrigines(P, null, null));
-  notes.push(
-    noteDeCalculHtml(
-      {
-        titre: 'Halle',
-        date: '2026-10-24',
-        profil: P.nom,
-        entrees: blocsDEntree(SAISI),
-        dessins: [],
-        resultats: [...blocsVent(motif), ...blocsNeige(motif)],
-        avertissements: avertissementsDeLaNote(motif, motif),
-        hypotheses: HYPOTHESES,
-      },
-      STYLES_TRACE
-    )
-  );
+  notes.push(noteDeCalculHtml(noteDuCalcul(P, SAISI, motif, motif, CARTOUCHE), STYLES_TRACE));
   return { ecran, notes, csv };
 }
 
@@ -149,11 +122,10 @@ describe('titre', () => {
 });
 
 describe('main.ts passe par les fonctions testees', () => {
-  it('entrees, avertissements et hypotheses de la note, CSV', () => {
+  it('note commune et CSV', () => {
     const main = lire('../../app/src/main.ts');
     expect(main).toContain('blocsDEntree(');
-    expect(main).toContain('avertissementsDeLaNote(');
-    expect(main).toContain('HYPOTHESES');
+    expect(main).toContain('noteDuCalcul(');
     expect(main).toContain('blocsEnTexte(');
   });
 });

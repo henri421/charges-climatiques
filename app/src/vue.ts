@@ -43,15 +43,11 @@ export function bandeauProfil(profil: ProfilNormatif): string {
   )}</p><p class="profil-perimetre">${notationHtml(profil.perimetre)}</p>`;
 }
 
-/** Tableau des provenances : chaque grandeur de base et d'ou elle vient. */
-export function tableauOrigines(profil: ProfilNormatif, vent: ResultatVent | null, neige: ResultatNeige | null): string {
-  const lignes: string[] = [];
+/** Lignes des provenances : grandeur, libelle, valeur, origine, source. */
+export function lignesOrigines(profil: ProfilNormatif, vent: ResultatVent | null, neige: ResultatNeige | null): string[][] {
+  const lignes: string[][] = [];
   const ajouter = (sym: string, lib: string, val: string, orig: string, source: string): void => {
-    lignes.push(
-      `<tr><th>${notationHtml(sym)}</th><td class="libelle">${notationHtml(lib)}</td><td class="valeur">${notationHtml(
-        val
-      )}</td><td class="origine origine-${echapper(orig)}">${notationHtml(orig)}</td><td class="source">${notationHtml(source)}</td></tr>`
-    );
+    lignes.push([sym, lib, val, orig, source]);
   };
   if (vent !== null) {
     ajouter('v_b', 'vitesse de référence', `${aff(vent.v_b, 2)} m/s`, ORIGINES[vent.origines.v_b0], 'v_b,0 saisi, x c_dir x c_season');
@@ -78,6 +74,17 @@ export function tableauOrigines(profil: ProfilNormatif, vent: ResultatVent | nul
       neige.origines.C_t === 'saisi' ? 'justification hors outil' : profil.neige.C_t.source
     );
   }
+  return lignes;
+}
+
+/** Tableau des provenances : chaque grandeur de base et d'ou elle vient. */
+export function tableauOrigines(profil: ProfilNormatif, vent: ResultatVent | null, neige: ResultatNeige | null): string {
+  const lignes = lignesOrigines(profil, vent, neige).map(
+    ([sym, lib, val, orig, source]) =>
+      `<tr><th>${notationHtml(sym)}</th><td class="libelle">${notationHtml(lib)}</td><td class="valeur">${notationHtml(
+        val
+      )}</td><td class="origine origine-${echapper(orig)}">${notationHtml(orig)}</td><td class="source">${notationHtml(source)}</td></tr>`
+  );
   if (lignes.length === 0) return `<p class="note">${notationHtml('Aucune grandeur de base exploitable : renseigner v_b,0 et s_k.')}</p>`;
   return `<div class="defilement"><table class="grandeurs origines"><thead><tr><th>Grandeur</th><th class="libelle">Libellé</th><th class="valeur">Valeur</th><th>Origine</th><th>Source</th></tr></thead><tbody>${lignes.join(
     ''
