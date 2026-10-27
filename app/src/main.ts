@@ -10,7 +10,7 @@
 
 import {
   blocsEnTexte,
-  nombreAffiche,
+  noteDeCalculHtml,
   notationHtml,
   notationTexte,
   ouvrirOuTelecharger,
@@ -38,7 +38,6 @@ import {
 import { dessinCasDeVent } from './dessin-vent';
 import { chargeMaximale, dessinCasDeNeige } from './dessin-neige';
 import {
-  avertissementsDeLaNote,
   bandeauProfil,
   blocsDEntree,
   blocsNeige,
@@ -49,7 +48,8 @@ import {
   rendreNeige,
   tableauOrigines,
 } from './vue';
-import { HYPOTHESES, STYLES_TRACE, noteDeCalculHtml } from './export';
+import { noteDuCalcul } from './note';
+import { STYLES_TRACE } from './export';
 import './style.css';
 
 /** Element attendu de la page ; son absence est une erreur de developpement. */
@@ -222,6 +222,39 @@ function rafraichir(): void {
 
 // --- Sorties --------------------------------------------------------------------
 
+const CLE_CARTOUCHE = 'charges-climatiques:cartouche';
+
+/** Cartouche saisi (projet, element). Un stockage absent ou corrompu donne du vide. */
+function lireCartouche(): { projet: string; element: string } {
+  const champ = (v: unknown): string => (typeof v === 'string' ? v : '');
+  try {
+    const brut = localStorage.getItem(CLE_CARTOUCHE);
+    const lu: unknown = brut === null ? null : JSON.parse(brut);
+    if (lu === null || typeof lu !== 'object') return { projet: '', element: '' };
+    const objet = lu as Record<string, unknown>;
+    return { projet: champ(objet.projet), element: champ(objet.element) };
+  } catch {
+    return { projet: '', element: '' };
+  }
+}
+
+const champsCartouche = {
+  projet: exige<HTMLInputElement>('[data-role="projet"]'),
+  element: exige<HTMLInputElement>('[data-role="element"]'),
+};
+
+/** Enregistre la saisie ; sans stockage disponible, elle vaut pour la session. */
+function enregistrerCartouche(): void {
+  try {
+    localStorage.setItem(
+      CLE_CARTOUCHE,
+      JSON.stringify({ projet: champsCartouche.projet.value, element: champsCartouche.element.value })
+    );
+  } catch {
+    // Rien a signaler : la note reste exportable avec la saisie courante.
+  }
+}
+
 function sansCalcul(): void {
   montrer(zones.erreurSaisie, 'Aucun calcul à exporter : corriger la saisie, puis réessayer.');
 }
@@ -275,21 +308,12 @@ document.addEventListener('click', (evenement) => {
       'application/json;charset=utf-8'
     );
   } else if (action === 'exporter-note') {
-    const avert = avertissementsDeLaNote(e.vent, e.neige);
     const html = noteDeCalculHtml(
-      {
-        titre: `Batiment ${nombreAffiche(e.modele.longueur, 2)} x ${nombreAffiche(
-          e.modele.largeur,
-          2
-        )} x ${nombreAffiche(e.modele.hauteur, 2)} m`,
+      noteDuCalcul(PROFIL, e.modele, e.vent, e.neige, {
+        projet: champsCartouche.projet.value,
+        element: champsCartouche.element.value,
         date: new Date().toISOString().slice(0, 10),
-        profil: `${PROFIL.nom} (${PROFIL.date})`,
-        entrees: blocsDEntree(e.modele),
-        dessins: dessins(e),
-        resultats: [...blocsVent(e.vent), ...blocsNeige(e.neige)],
-        avertissements: avert,
-        hypotheses: HYPOTHESES,
-      },
+      }),
       STYLES_TRACE
     );
     ouvrirOuTelecharger('charges-climatiques-note.html', html);
@@ -303,6 +327,10 @@ selecteurCas.addEventListener('change', () => {
 
 zones.profil.innerHTML = bandeauProfil(PROFIL);
 ecrireModele(modeleParDefaut());
+const cartouche = lireCartouche();
+champsCartouche.projet.value = cartouche.projet;
+champsCartouche.element.value = cartouche.element;
+exige<HTMLElement>('#sorties').addEventListener('input', enregistrerCartouche);
 formulaire.addEventListener('input', rafraichir);
 formulaire.addEventListener('change', rafraichir);
 rafraichir();
