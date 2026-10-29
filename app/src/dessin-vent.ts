@@ -11,6 +11,7 @@
  */
 
 import { nombreAffiche, nombreFr, notationSvg, notationTexte } from 'aedificium-ui';
+import { phrase, textes } from './textes';
 import type { CasDeVent, Face, Zone } from '../../src/index';
 
 const LARGEUR_SVG = 680;
@@ -18,12 +19,6 @@ const MARGE = 24;
 const ECART = 28;
 const HAUT_TITRE = 34;
 
-const ROLES: Record<string, string> = {
-  'au-vent': 'au vent',
-  'sous-le-vent': 'sous le vent',
-  laterale: 'latérale',
-  toiture: 'toiture (plan)',
-};
 
 /** Nombre affiche : trois decimales au plus, sans zeros inutiles. */
 function aff(valeur: number, decimales = 3): string {
@@ -98,7 +93,7 @@ function dessinerZones(face: Face, c: Cadre): string {
               .join(' ')}</text>`
           : '';
       return `<polygon class="${classeZone(z)}" points="${pts.join(' ')}"><title>${notationTexte(
-        `Zone ${z.nom} : c_pe = ${texteCpeAffiche(z)}, w_net = ${texteWnetAffiche(z)} kN/m2`
+        textes().dessins.zone(z.nom, texteCpeAffiche(z), texteWnetAffiche(z))
       )}</title></polygon>${texte}`;
     })
     .join('');
@@ -136,7 +131,7 @@ export function dessinCasDeVent(cas: CasDeVent): string {
       const yFace = y + (hRangee - f.hauteur) * echelle;
       morceaux.push(
         `<g class="face"><text class="face-titre" x="${x.toFixed(1)}" y="${(y - 8).toFixed(1)}">${notationSvg(
-          `${f.nom} · ${ROLES[f.role]}`
+          `${phrase(f.nom)} · ${textes().dessins.roles[f.role]}`
         )}</text>${dessinerZones(f, { x, y: yFace, echelle, hauteurFace: f.hauteur })}<rect class="face-cadre" x="${x.toFixed(1)}" y="${yFace.toFixed(1)}" width="${(f.largeur * echelle).toFixed(1)}" height="${(f.hauteur * echelle).toFixed(1)}"/></g>`
       );
       x += f.largeur * echelle + ECART;
@@ -154,7 +149,7 @@ export function dessinCasDeVent(cas: CasDeVent): string {
     const wPx = toiture.largeur * echelle;
     const hPx = toiture.hauteur * echelle;
     morceaux.push(
-      `<g class="face"><text class="face-titre" x="${xToit}" y="${(yToit - 10).toFixed(1)}">toiture · plan, rive au vent en bas</text>${dessinerZones(
+      `<g class="face"><text class="face-titre" x="${xToit}" y="${(yToit - 10).toFixed(1)}">${notationSvg(textes().dessins.toiturePlan)}</text>${dessinerZones(
         toiture,
         { x: xToit, y: yToit, echelle, hauteurFace: toiture.hauteur }
       )}<rect class="face-cadre" x="${xToit}" y="${yToit.toFixed(1)}" width="${wPx.toFixed(1)}" height="${hPx.toFixed(1)}"/></g>`
@@ -163,13 +158,13 @@ export function dessinCasDeVent(cas: CasDeVent): string {
     const fx = xToit + wPx / 2;
     const fy = yToit + hPx + 34;
     morceaux.push(
-      `<g class="vent"><line x1="${fx.toFixed(1)}" y1="${fy.toFixed(1)}" x2="${fx.toFixed(1)}" y2="${(fy - 24).toFixed(1)}"/><path d="M ${(fx - 5).toFixed(1)} ${(fy - 18).toFixed(1)} L ${fx.toFixed(1)} ${(fy - 26).toFixed(1)} L ${(fx + 5).toFixed(1)} ${(fy - 18).toFixed(1)} Z"/><text x="${(fx + 10).toFixed(1)}" y="${(fy - 8).toFixed(1)}">vent</text></g>`
+      `<g class="vent"><line x1="${fx.toFixed(1)}" y1="${fy.toFixed(1)}" x2="${fx.toFixed(1)}" y2="${(fy - 24).toFixed(1)}"/><path d="M ${(fx - 5).toFixed(1)} ${(fy - 18).toFixed(1)} L ${fx.toFixed(1)} ${(fy - 26).toFixed(1)} L ${(fx + 5).toFixed(1)} ${(fy - 18).toFixed(1)} Z"/><text x="${(fx + 10).toFixed(1)}" y="${(fy - 8).toFixed(1)}">${textes().dessins.vent}</text></g>`
     );
     hauteurSvg = fy + MARGE;
   }
 
-  const titre = `${cas.libelle} · e = ${aff(cas.e, 2)} m · w_i = ${signeAffiche(cas.w_i, 3)} kN/m2`;
+  const titre = `${phrase(cas.libelle)} · e = ${aff(cas.e, 2)} m · w_i = ${signeAffiche(cas.w_i, 3)} kN/m2`;
   return `<svg class="schema-vent" viewBox="0 0 ${LARGEUR_SVG} ${hauteurSvg.toFixed(0)}" role="img" aria-label="${notationTexte(
-    `Zonage du vent, ${cas.libelle}`
+    textes().dessins.zonage(phrase(cas.libelle))
   )}"><text class="titre" x="${MARGE}" y="${MARGE}">${notationSvg(titre)}</text>${morceaux.join('')}</svg>`;
 }

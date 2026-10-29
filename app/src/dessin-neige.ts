@@ -7,6 +7,7 @@
  */
 
 import { nombreAffiche, notationSvg, notationTexte } from 'aedificium-ui';
+import { phrase, textes } from './textes';
 import type { CasDeNeige, Toiture } from '../../src/index';
 import { largeursDesVersants } from '../../src/index';
 
@@ -85,11 +86,11 @@ export function dessinCasDeNeige(cas: CasDeNeige, toiture: Toiture, sMax: number
   const hauteur = yBase + 12 + HAUT_TOITURE + 26;
   const legende =
     cas.repere === 'toiture'
-      ? `x de 0 (rive y-) à ${aff(longueur, 2)} m`
-      : `x depuis le mur ou l'obstacle, jusqu'à ${aff(longueur, 2)} m`;
+      ? textes().dessins.xRive(aff(longueur, 2))
+      : textes().dessins.xObstacle(aff(longueur, 2));
   return `<svg class="schema-neige" viewBox="0 0 ${LARGEUR_SVG} ${hauteur.toFixed(0)}" role="img" aria-label="${notationTexte(
-    cas.nom
-  )}"><text class="titre" x="${MARGE}" y="${MARGE}">${notationSvg(`${cas.nom} — ${cas.description}`)}</text>${poly}<line class="base" x1="${X(0)}" y1="${Y(0)}" x2="${X(longueur)}" y2="${Y(0)}"/>${etiquettes.join('')}${support}<text class="legende" x="${MARGE}" y="${(hauteur - 8).toFixed(1)}">${notationSvg(
-    `s en kN/m2 de projection horizontale · ${legende}`
+    phrase(cas.nom)
+  )}"><text class="titre" x="${MARGE}" y="${MARGE}">${notationSvg(`${phrase(cas.nom)} — ${phrase(cas.description)}`)}</text>${poly}<line class="base" x1="${X(0)}" y1="${Y(0)}" x2="${X(longueur)}" y2="${Y(0)}"/>${etiquettes.join('')}${support}<text class="legende" x="${MARGE}" y="${(hauteur - 8).toFixed(1)}">${notationSvg(
+    textes().dessins.legendeNeige(legende)
   )}</text></svg>`;
 }

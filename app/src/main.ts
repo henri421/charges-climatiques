@@ -10,6 +10,8 @@
 
 import {
   blocsEnTexte,
+  definirLangue,
+  langueDuDocument,
   noteDeCalculHtml,
   notationHtml,
   notationTexte,
@@ -48,14 +50,17 @@ import {
   rendreNeige,
   tableauOrigines,
 } from './vue';
+import { phrase, textes } from './textes';
 import { noteDuCalcul } from './note';
 import { STYLES_TRACE } from './export';
 import './style.css';
 
+definirLangue(langueDuDocument(document));
+
 /** Element attendu de la page ; son absence est une erreur de developpement. */
 function exige<T extends Element>(selecteur: string): T {
   const trouve = document.querySelector(selecteur);
-  if (trouve === null) throw new Error(`element absent de la page : ${selecteur}`);
+  if (trouve === null) throw new Error(textes().messages.elementAbsent(selecteur));
   return trouve as T;
 }
 
@@ -151,7 +156,7 @@ function peindreVent(vent: ResultatVent | string): void {
   zones.ventAvert.innerHTML = rendreAvertissements(avert);
   if (casChoisi >= vent.cas.length) casChoisi = 0;
   selecteurCas.innerHTML = vent.cas
-    .map((c, i) => `<option value="${i}"${i === casChoisi ? ' selected' : ''}>${notationTexte(c.libelle).replace(/</g, '&lt;')}</option>`)
+    .map((c, i) => `<option value="${i}"${i === casChoisi ? ' selected' : ''}>${notationTexte(phrase(c.libelle)).replace(/</g, '&lt;')}</option>`)
     .join('');
   const cas = vent.cas[casChoisi];
   // Le schema affiche porte son propre bouton d'export : `dessins()` range
@@ -256,7 +261,7 @@ function enregistrerCartouche(): void {
 }
 
 function sansCalcul(): void {
-  montrer(zones.erreurSaisie, 'Aucun calcul à exporter : corriger la saisie, puis réessayer.');
+  montrer(zones.erreurSaisie, textes().messages.rienAExporter);
 }
 
 /**
@@ -265,7 +270,7 @@ function sansCalcul(): void {
  * suivent le premier : un seul fichier sortait.
  */
 function boutonDessin(indice: number): string {
-  return `<button type="button" class="exporter-dessin" data-action="exporter-dessin" data-dessin="${indice}">Ce schema (SVG)</button>`;
+  return `<button type="button" class="exporter-dessin" data-action="exporter-dessin" data-dessin="${indice}">${textes().messages.ceSchema}</button>`;
 }
 
 function dessins(e: Etat): string[] {

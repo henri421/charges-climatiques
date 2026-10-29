@@ -11,26 +11,15 @@ import { batimentDepuisModele, type ModeleSaisie } from './form';
 import { dessinCasDeVent } from './dessin-vent';
 import { chargeMaximale, dessinCasDeNeige } from './dessin-neige';
 import { avertissementsDeLaNote, blocsDEntree, blocsNeige, blocsVent, lignesOrigines } from './vue';
+import { phrase, textes } from './textes';
 
 /** Hypotheses et limites rappelees dans la note de calcul. */
-export const HYPOTHESES: string[] = [
-  'Bâtiment à base rectangulaire ; méthode de la pression de pointe (EN 1991-1-4 §4.5).',
-  'Hauteur de référence des parois latérales, sous le vent et de la toiture : z_e = h. Pression intérieure à z_i = h.',
-  'Bandes intermédiaires de la face au vent de hauteur au plus b, à z_e = leur sommet.',
-  'Zonage au vent des toitures inclinées non traité dans cette version.',
-  'Neige : situations durables et transitoires ; neige exceptionnelle hors périmètre.',
-  "Valeurs recommandées de l'Eurocode, sauf grandeurs de base saisies ; aucune annexe nationale codée.",
-];
+export const HYPOTHESES: string[] = textes().note.hypotheses;
 
-export const AVERTISSEMENT_PROFIL =
-  "Les actions climatiques dépendent de l'annexe nationale en vigueur au lieu de construction : " +
-  'vérifier que le profil actif correspond au texte applicable au projet.';
+export const AVERTISSEMENT_PROFIL = textes().note.avertissementProfil;
 
-const ENTETES_ORIGINES = ['Grandeur', 'Libellé', 'Valeur', 'Origine', 'Source'];
-
-/** Nom du batiment quand l'element n'est pas renseigne. */
 export function nomDuBatiment(m: ModeleSaisie): string {
-  return `Bâtiment ${nombreAffiche(m.longueur, 2)} x ${nombreAffiche(m.largeur, 2)} x ${nombreAffiche(m.hauteur, 2)} m`;
+  return textes().note.batiment(nombreAffiche(m.longueur, 2), nombreAffiche(m.largeur, 2), nombreAffiche(m.hauteur, 2));
 }
 
 /**
@@ -44,6 +33,7 @@ export function noteDuCalcul(
   neige: ResultatNeige | string,
   cartouche: { projet: string; element: string; date: string }
 ): NoteDeCalcul {
+  const t = textes();
   const [batiment, site] = blocsDEntree(m);
   const calculs: ElementNote[] = [];
 
@@ -52,7 +42,7 @@ export function noteDuCalcul(
   calculs.push({ type: 'bloc', bloc: bv[0] });
   if (typeof vent !== 'string') {
     vent.cas.forEach((c, i) => {
-      calculs.push({ type: 'figure', svg: dessinCasDeVent(c), legende: c.libelle });
+      calculs.push({ type: 'figure', svg: dessinCasDeVent(c), legende: phrase(c.libelle) });
       calculs.push({ type: 'bloc', bloc: bv[i + 1] });
     });
   }
@@ -63,7 +53,7 @@ export function noteDuCalcul(
     const sMax = chargeMaximale(neige.cas);
     const toiture = batimentDepuisModele(m).toiture;
     neige.cas.forEach((c, i) => {
-      calculs.push({ type: 'figure', svg: dessinCasDeNeige(c, toiture, sMax), legende: `${c.nom} — ${c.description}` });
+      calculs.push({ type: 'figure', svg: dessinCasDeNeige(c, toiture, sMax), legende: `${phrase(c.nom)} — ${phrase(c.description)}` });
       calculs.push({ type: 'bloc', bloc: bn[i + 1] });
     });
     // Debord et arret de neige.
@@ -87,15 +77,15 @@ export function noteDuCalcul(
     sections: {
       geometrie: [{ type: 'bloc', bloc: batiment }],
       hypotheses: [
-        { type: 'texte', texte: `Profil normatif : ${profil.nom}, données consultées le ${profil.date}. ${profil.perimetre}` },
-        { type: 'liste', items: HYPOTHESES },
-        { type: 'texte', texte: AVERTISSEMENT_PROFIL },
+        { type: 'texte', texte: t.note.profil(phrase(profil.nom), profil.date, phrase(profil.perimetre)) },
+        { type: 'liste', items: t.note.hypotheses },
+        { type: 'texte', texte: t.note.avertissementProfil },
       ],
       charges: [
         { type: 'bloc', bloc: site },
         ...(origines.length === 0
           ? []
-          : [{ type: 'tableau' as const, titre: 'Provenance des grandeurs de base', entetes: ENTETES_ORIGINES, lignes: origines }]),
+          : [{ type: 'tableau' as const, titre: t.note.provenance, entetes: t.origine.entetes, lignes: origines }]),
       ],
       calculs,
     },

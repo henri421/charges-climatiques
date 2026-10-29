@@ -9,7 +9,8 @@
  * charges en kN/m2, aire en m2.
  */
 
-import { lireNombre } from 'aedificium-ui';
+import { langueCourante, lireNombre } from 'aedificium-ui';
+import { textes } from './textes';
 import type { Batiment, CategorieTerrain, NomFace, Rugosite, Site, TopographieNeige } from '../../src/index';
 
 export type TypeToiture = 'plate' | 'un-versant' | 'deux-versants';
@@ -101,7 +102,7 @@ export function modeleParDefaut(): ModeleSaisie {
     arret: false,
     debord: false,
     obstacle: false,
-    obsNom: 'edicule',
+    obsNom: textes().saisie.obstacle,
     obsHauteur: 1,
     adjacente: false,
     adjFace: 'y+',
@@ -118,41 +119,19 @@ const RUGOSITES: readonly Rugosite[] = ['lisse', 'rugueuse', 'tres-rugueuse'];
 const TOPOGRAPHIES: readonly TopographieNeige[] = ['battue-par-les-vents', 'normale', 'abritee'];
 
 /** Libelles des champs, pour des messages d'erreur lisibles. */
-const LIBELLES: Record<string, string> = {
-  longueur: 'Longueur (m)',
-  largeur: 'Largeur (m)',
-  hauteur: 'Hauteur h (m)',
-  acrotere: 'Acrotère h_p (m)',
-  pente: 'Pente (degrés)',
-  pente1: 'Pente du versant y- (degrés)',
-  pente2: 'Pente du versant y+ (degrés)',
-  pi_rapport: 'Rapport des ouvertures (-)',
-  pi_abscisse: 'Abscisse des ouvertures (m)',
-  cs_valeur: 'c_s c_d (-)',
-  v_b0: 'v_b,0 (m/s)',
-  c_o: 'c_o (-)',
-  aire: 'Aire chargée (m2)',
-  s_k: 's_k (kN/m2)',
-  altitude: 'Altitude (m)',
-  C_t: 'C_t (-)',
-  obs_hauteur: "Hauteur de l'obstacle (m)",
-  adj_difference: 'Différence de hauteur h (m)',
-  adj_largeur: 'Largeur b_1 de la toiture haute (m)',
-  adj_pente: 'Pente de la toiture haute (degrés)',
-};
 
 class ErreurDeSaisie extends Error {}
 
 function choix<T extends string>(valeurs: Record<string, string>, nom: string, permis: readonly T[]): T {
   const v = valeurs[nom];
   if ((permis as readonly string[]).includes(v)) return v as T;
-  throw new ErreurDeSaisie(`Valeur inattendue pour ${nom} : « ${v ?? ''} ».`);
+  throw new ErreurDeSaisie(textes().saisie.valeurInattendue(nom, v ?? ''));
 }
 
 function nombre(valeurs: Record<string, string>, nom: string, requis: boolean, repli: number): number {
   const v = lireNombre(valeurs[nom] ?? '');
   if (v === null) {
-    if (requis) throw new ErreurDeSaisie(`${LIBELLES[nom] ?? nom} : nombre attendu.`);
+    if (requis) throw new ErreurDeSaisie(textes().saisie.nombreAttendu(textes().saisie.libelles[nom] ?? nom));
     return repli;
   }
   return v;
@@ -162,7 +141,7 @@ function nombreOuVide(valeurs: Record<string, string>, nom: string): number | nu
   const texte = (valeurs[nom] ?? '').trim();
   if (texte === '') return null;
   const v = lireNombre(texte);
-  if (v === null) throw new ErreurDeSaisie(`${LIBELLES[nom] ?? nom} : nombre attendu, ou champ vide.`);
+  if (v === null) throw new ErreurDeSaisie(textes().saisie.nombreOuVide(textes().saisie.libelles[nom] ?? nom));
   return v;
 }
 
@@ -231,7 +210,7 @@ export function modeleDepuisChamps(valeurs: Record<string, string>): Lecture {
 
 /** Valeurs des champs pour un modele : l'inverse de `modeleDepuisChamps`. */
 export function champsDepuisModele(m: ModeleSaisie): Record<string, string> {
-  const n = (v: number): string => String(v).replace('.', ',');
+  const n = (v: number): string => String(v).replace('.', langueCourante() === 'en' ? '.' : ',');
   const c = (v: boolean): string => (v ? 'oui' : 'non');
   return {
     longueur: n(m.longueur),
