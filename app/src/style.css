@@ -57,6 +57,7 @@ body {
 }
 
 header,
+.feuilles,
 main,
 footer {
   max-width: 68rem;
@@ -497,4 +498,12 @@ svg .legende { fill: var(--texte-doux); font-size: 11px; }
   gap: 1rem;
   min-width: 0;
   align-content: start;
+}
+
+/* Barre des feuilles de calcul (projets de la suite) : alignee sur la page. */
+.feuilles {
+  margin-top: 0.8rem;
+}
+.feuilles:empty {
+  display: none;
 }

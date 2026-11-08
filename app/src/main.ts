@@ -8,6 +8,7 @@
  * n'empeche pas l'affichage de l'autre.
  */
 
+import { brancherFeuilles, type BarreFeuilles, type Json } from 'aedificium-ui';
 import {
   blocsEnTexte,
   definirLangue,
@@ -190,7 +191,11 @@ function peindreNeige(neige: ResultatNeige | string, modele: ModeleSaisie): void
  * resultat valide, sous une erreur bien visible : effacer la page a chaque
  * frappe intermediaire rendrait la saisie illisible.
  */
+/** Feuilles de calcul d'un projet de la suite : la feuille est le releve des champs. */
+let barre: BarreFeuilles | null = null;
+
 function rafraichir(): void {
+  barre?.signaler();
   const lecture = modeleDepuisChamps(valeursDesChamps());
   if (!lecture.ok) {
     montrer(zones.erreurSaisie, lecture.message);
@@ -338,6 +343,26 @@ champsCartouche.element.value = cartouche.element;
 exige<HTMLElement>('#sorties').addEventListener('input', enregistrerCartouche);
 formulaire.addEventListener('input', rafraichir);
 formulaire.addEventListener('change', rafraichir);
+barre = brancherFeuilles({
+  app: 'charges-climatiques',
+  nomApp: exige<HTMLElement>('header h1').textContent ?? 'charges-climatiques',
+  conteneur: exige<HTMLElement>('[data-role="feuilles"]'),
+  lire: () => valeursDesChamps() as Json,
+  charger: (d) => {
+    if (d === null) ecrireModele(modeleParDefaut());
+    else {
+      const v = d as Record<string, string>;
+      for (const el of champs()) {
+        const valeur = v[el.getAttribute('data-champ') ?? ''];
+        if (valeur === undefined) continue;
+        if (el instanceof HTMLInputElement && el.type === 'checkbox') el.checked = valeur === 'oui';
+        else el.value = valeur;
+      }
+    }
+    rafraichir();
+  },
+});
+
 rafraichir();
 
 // Hors navigateur (tests), pas de service worker.
