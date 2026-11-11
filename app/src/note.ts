@@ -12,6 +12,7 @@ import { dessinCasDeVent } from './dessin-vent';
 import { chargeMaximale, dessinCasDeNeige } from './dessin-neige';
 import { avertissementsDeLaNote, blocsDEntree, blocsNeige, blocsVent, lignesOrigines } from './vue';
 import { phrase, textes } from './textes';
+import { VERSION_OUTIL } from './version';
 
 /** Hypotheses et limites rappelees dans la note de calcul. */
 export const HYPOTHESES: string[] = textes().note.hypotheses;
@@ -68,6 +69,7 @@ export function noteDuCalcul(
 
   return {
     cartouche: {
+      version: VERSION_OUTIL,
       projet: cartouche.projet,
       element: cartouche.element.trim() === '' ? nomDuBatiment(m) : cartouche.element,
       date: cartouche.date,
