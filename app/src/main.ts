@@ -10,25 +10,29 @@
 
 import { brancherFeuilles, type BarreFeuilles, type Json } from 'aedificium-ui';
 import {
+  avertissementAnnexeLu,
   blocsEnTexte,
   definirLangue,
   langueDuDocument,
+  lireAnnexe,
   noteDeCalculHtml,
   notationHtml,
   notationTexte,
+  optionsAnnexe,
   ouvrirOuTelecharger,
   resultatsEnCsv,
   svgAutonome,
   telecharger,
 } from 'aedificium-ui';
 import {
-  ec1Recommande,
   exporterActions,
   verifierNeige,
   verifierVent,
+  type ProfilNormatif,
   type ResultatNeige,
   type ResultatVent,
 } from '../../src/index';
+import { COEFS, coefsDeLAnnexe, profilDeCalcul, type Coefs } from './annexe';
 import {
   aireChargeeDepuisModele,
   batimentDepuisModele,
@@ -65,11 +69,10 @@ function exige<T extends Element>(selecteur: string): T {
   return trouve as T;
 }
 
-const PROFIL = ec1Recommande();
-
 const formulaire = exige<HTMLFormElement>('#formulaire');
 const selecteurCas = exige<HTMLSelectElement>('[data-role="cas-vent"]');
 const zones = {
+  annexe: exige<HTMLElement>('[data-role="bandeau-annexe"]'),
   profil: exige<HTMLElement>('[data-role="profil-corps"]'),
   origines: exige<HTMLElement>('[data-role="origines-corps"]'),
   erreurSaisie: exige<HTMLElement>('[data-role="erreur-saisie"]'),
@@ -126,6 +129,15 @@ function ajusterLesGroupes(m: ModeleSaisie): void {
   }
 }
 
+/** Coefficients de l'annexe, reecrits dans leurs champs (changement d'annexe). */
+function ecrireCoefs(coefs: Coefs): void {
+  const valeurs = champsDepuisModele({ ...modeleParDefaut(), coefs });
+  for (const k of COEFS) {
+    const champ = formulaire.querySelector<HTMLInputElement>(`[data-champ="coef_${k}"]`);
+    if (champ !== null) champ.value = valeurs[`coef_${k}`] ?? '';
+  }
+}
+
 function montrer(el: HTMLElement, message: string | null): void {
   el.innerHTML = message === null ? '' : notationHtml(message);
   el.hidden = message === null;
@@ -134,6 +146,7 @@ function montrer(el: HTMLElement, message: string | null): void {
 // --- Etat ---------------------------------------------------------------------
 
 interface Etat {
+  profil: ProfilNormatif;
   modele: ModeleSaisie;
   vent: ResultatVent | string;
   neige: ResultatNeige | string;
@@ -196,7 +209,12 @@ let barre: BarreFeuilles | null = null;
 
 function rafraichir(): void {
   barre?.signaler();
-  const lecture = modeleDepuisChamps(valeursDesChamps());
+  const valeurs = valeursDesChamps();
+  // Le bandeau de l'annexe suit le choix, meme si une autre saisie est illisible.
+  const annexe = lireAnnexe(valeurs.annexe);
+  zones.annexe.hidden = annexe !== 'lu';
+  zones.annexe.textContent = annexe === 'lu' ? avertissementAnnexeLu() : '';
+  const lecture = modeleDepuisChamps(valeurs);
   if (!lecture.ok) {
     montrer(zones.erreurSaisie, lecture.message);
     return;
@@ -204,25 +222,27 @@ function rafraichir(): void {
   montrer(zones.erreurSaisie, null);
   const modele = lecture.modele;
   ajusterLesGroupes(modele);
+  const profil = profilDeCalcul(modele.annexe, modele.coefs);
+  zones.profil.innerHTML = bandeauProfil(profil);
   const batiment = batimentDepuisModele(modele);
   const site = siteDepuisModele(modele);
 
   let vent: ResultatVent | string;
   try {
-    vent = verifierVent(PROFIL, batiment, site, { aireChargee: aireChargeeDepuisModele(modele) });
+    vent = verifierVent(profil, batiment, site, { aireChargee: aireChargeeDepuisModele(modele) });
   } catch (e) {
     vent = messageDErreur(e);
   }
   let neige: ResultatNeige | string;
   try {
-    neige = verifierNeige(PROFIL, batiment, site);
+    neige = verifierNeige(profil, batiment, site);
   } catch (e) {
     neige = messageDErreur(e);
   }
 
-  etat = { modele, vent, neige };
+  etat = { profil, modele, vent, neige };
   zones.origines.innerHTML = tableauOrigines(
-    PROFIL,
+    profil,
     typeof vent === 'string' ? null : vent,
     typeof neige === 'string' ? null : neige
   );
@@ -314,12 +334,12 @@ document.addEventListener('click', (evenement) => {
   } else if (action === 'exporter-json') {
     telecharger(
       'charges-climatiques-actions.json',
-      JSON.stringify(exporterActions({ nom: PROFIL.nom, date: PROFIL.date }, e.neige, e.vent), null, 2),
+      JSON.stringify(exporterActions({ nom: e.profil.nom, date: e.profil.date }, e.neige, e.vent), null, 2),
       'application/json;charset=utf-8'
     );
   } else if (action === 'exporter-note') {
     const html = noteDeCalculHtml(
-      noteDuCalcul(PROFIL, e.modele, e.vent, e.neige, {
+      noteDuCalcul(e.profil, e.modele, e.vent, e.neige, {
         projet: champsCartouche.projet.value,
         element: champsCartouche.element.value,
         date: new Date().toISOString().slice(0, 10),
@@ -335,12 +355,18 @@ selecteurCas.addEventListener('change', () => {
   if (etat !== null) peindreVent(etat.vent);
 });
 
-zones.profil.innerHTML = bandeauProfil(PROFIL);
+exige<HTMLSelectElement>('[data-champ="annexe"]').innerHTML = optionsAnnexe('recommande');
 ecrireModele(modeleParDefaut());
 const cartouche = lireCartouche();
 champsCartouche.projet.value = cartouche.projet;
 champsCartouche.element.value = cartouche.element;
 exige<HTMLElement>('#sorties').addEventListener('input', enregistrerCartouche);
+// Changer d'annexe repremplit ses coefficients ; chacun reste modifiable ensuite.
+formulaire.addEventListener('change', (ev) => {
+  const cible = ev.target;
+  if (!(cible instanceof HTMLSelectElement) || cible.dataset.champ !== 'annexe') return;
+  ecrireCoefs(coefsDeLAnnexe(lireAnnexe(cible.value)));
+});
 formulaire.addEventListener('input', rafraichir);
 formulaire.addEventListener('change', rafraichir);
 barre = brancherFeuilles({
@@ -349,8 +375,9 @@ barre = brancherFeuilles({
   conteneur: exige<HTMLElement>('[data-role="feuilles"]'),
   lire: () => valeursDesChamps() as Json,
   charger: (d) => {
-    if (d === null) ecrireModele(modeleParDefaut());
-    else {
+    // Les valeurs par defaut d'abord : un fichier ancien, sans annexe ni coefficients, les garde.
+    ecrireModele(modeleParDefaut());
+    if (d !== null) {
       const v = d as Record<string, string>;
       for (const el of champs()) {
         const valeur = v[el.getAttribute('data-champ') ?? ''];

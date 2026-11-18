@@ -5,13 +5,14 @@
  * conclusions, seulement les actions caracteristiques et leur provenance.
  */
 
-import { nombreAffiche, type ElementNote, type NoteDeCalcul } from 'aedificium-ui';
+import { avertissementAnnexeLu, libelleAnnexe, nombreAffiche, type ElementNote, type NoteDeCalcul } from 'aedificium-ui';
 import type { ProfilNormatif, ResultatNeige, ResultatVent } from '../../src/index';
+import { COEFS, SYMBOLES, valeurDe } from './annexe';
 import { batimentDepuisModele, type ModeleSaisie } from './form';
 import { dessinCasDeVent } from './dessin-vent';
 import { chargeMaximale, dessinCasDeNeige } from './dessin-neige';
 import { avertissementsDeLaNote, blocsDEntree, blocsNeige, blocsVent, lignesOrigines } from './vue';
-import { phrase, textes } from './textes';
+import { phrase, sourceAffichee, textes } from './textes';
 import { VERSION_OUTIL } from './version';
 
 /** Hypotheses et limites rappelees dans la note de calcul. */
@@ -73,13 +74,31 @@ export function noteDuCalcul(
       projet: cartouche.projet,
       element: cartouche.element.trim() === '' ? nomDuBatiment(m) : cartouche.element,
       date: cartouche.date,
-      norme: 'EN 1991-1-3, EN 1991-1-4',
+      norme:
+        m.annexe === 'lu'
+          ? 'EN 1991-1-3, EN 1991-1-4, ILNAS-EN 1991-1-3/AN-LU:2020, ILNAS-EN 1991-1-4/AN-LU:2020'
+          : 'EN 1991-1-3, EN 1991-1-4',
       outil: 'charges-climatiques',
     },
     sections: {
       geometrie: [{ type: 'bloc', bloc: batiment }],
       hypotheses: [
         { type: 'texte', texte: t.note.profil(phrase(profil.nom), profil.date, phrase(profil.perimetre)) },
+        {
+          type: 'bloc',
+          bloc: {
+            titre: `${t.annexe.coefficients} : ${libelleAnnexe(m.annexe)}`,
+            lignes: COEFS.map((k) => {
+              const v = valeurDe(profil, k);
+              return {
+                symbole: SYMBOLES[k],
+                libelle: `${t.annexe.libelles[k]} (${sourceAffichee(v.source)})`,
+                valeur: nombreAffiche(v.valeur, 4),
+              };
+            }),
+            note: null,
+          },
+        },
         { type: 'liste', items: t.note.hypotheses },
         { type: 'texte', texte: t.note.avertissementProfil },
       ],
@@ -92,6 +111,6 @@ export function noteDuCalcul(
       calculs,
     },
     verifications: [],
-    avertissements: avertissementsDeLaNote(vent, neige),
+    avertissements: [...(m.annexe === 'lu' ? [avertissementAnnexeLu()] : []), ...avertissementsDeLaNote(vent, neige)],
   };
 }

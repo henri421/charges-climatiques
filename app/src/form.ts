@@ -9,8 +9,9 @@
  * charges en kN/m2, aire en m2.
  */
 
-import { langueCourante, lireNombre } from 'aedificium-ui';
+import { langueCourante, lireAnnexe, lireNombre, type AnnexeNationale } from 'aedificium-ui';
 import { textes } from './textes';
+import { COEFS, SYMBOLES, coefsDeLAnnexe, type CleCoef, type Coefs } from './annexe';
 import type { Batiment, CategorieTerrain, NomFace, Rugosite, Site, TopographieNeige } from '../../src/index';
 
 export type TypeToiture = 'plate' | 'un-versant' | 'deux-versants';
@@ -61,6 +62,11 @@ export interface ModeleSaisie {
   adjDifference: number;
   adjLargeur: number;
   adjPente: number;
+
+  /** Annexe nationale choisie : elle preremplit les coefficients ci-dessous (lot E). */
+  annexe: AnnexeNationale;
+  /** Coefficients de l'annexe, modifiables un par un. */
+  coefs: Coefs;
 }
 
 export type Lecture = { ok: true; modele: ModeleSaisie } | { ok: false; message: string };
@@ -109,6 +115,8 @@ export function modeleParDefaut(): ModeleSaisie {
     adjDifference: 3,
     adjLargeur: 10,
     adjPente: 10,
+    annexe: 'recommande',
+    coefs: coefsDeLAnnexe('recommande'),
   };
 }
 
@@ -146,6 +154,18 @@ function nombreOuVide(valeurs: Record<string, string>, nom: string): number | nu
 }
 
 const oui = (valeurs: Record<string, string>, nom: string): boolean => valeurs[nom] === 'oui';
+
+/**
+ * Coefficient d'annexe `coef_<cle>`. Un fichier ancien, sans ce champ, garde la
+ * valeur recommandee (le repli) ; un champ present mais illisible est refuse.
+ */
+function coefficient(valeurs: Record<string, string>, cle: CleCoef, repli: number): number {
+  const brut = valeurs[`coef_${cle}`];
+  if (brut === undefined) return repli;
+  const v = lireNombre(brut);
+  if (v === null) throw new ErreurDeSaisie(textes().saisie.nombreAttendu(SYMBOLES[cle]));
+  return v;
+}
 
 /**
  * Lit le modele depuis les valeurs des champs (des chaines, cases cochees
@@ -200,6 +220,8 @@ export function modeleDepuisChamps(valeurs: Record<string, string>): Lecture {
       adjDifference: nombre(valeurs, 'adj_difference', adjacente, d.adjDifference),
       adjLargeur: nombre(valeurs, 'adj_largeur', adjacente, d.adjLargeur),
       adjPente: nombre(valeurs, 'adj_pente', adjacente, d.adjPente),
+      annexe: lireAnnexe(valeurs.annexe),
+      coefs: Object.fromEntries(COEFS.map((k) => [k, coefficient(valeurs, k, d.coefs[k])])) as Coefs,
     };
     return { ok: true, modele };
   } catch (e) {
@@ -250,6 +272,8 @@ export function champsDepuisModele(m: ModeleSaisie): Record<string, string> {
     adj_difference: n(m.adjDifference),
     adj_largeur: n(m.adjLargeur),
     adj_pente: n(m.adjPente),
+    annexe: m.annexe,
+    ...Object.fromEntries(COEFS.map((k) => [`coef_${k}`, n(m.coefs[k])])),
   };
 }
 

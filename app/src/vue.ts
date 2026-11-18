@@ -8,7 +8,7 @@
 import { echapper, nombreAffiche, notationHtml, type BlocResultat, type LigneResultat } from 'aedificium-ui';
 import type { CasDeVent, ProfilNormatif, ResultatNeige, ResultatVent } from '../../src/index';
 import type { ModeleSaisie } from './form';
-import { phrase, textes } from './textes';
+import { phrase, sourceAffichee, textes } from './textes';
 
 /** Message d'une erreur du noyau, pour la banniere. */
 export function messageDErreur(e: unknown): string {
@@ -38,7 +38,7 @@ export function lignesOrigines(profil: ProfilNormatif, vent: ResultatVent | null
   const ORIGINES = t.origines;
   const lignes: string[][] = [];
   const ajouter = (sym: string, lib: string, val: string, orig: string, source: string): void => {
-    lignes.push([sym, lib, val, orig, phrase(source)]);
+    lignes.push([sym, lib, val, orig, sourceAffichee(source)]);
   };
   if (vent !== null) {
     ajouter('v_b', o.v_b, `${aff(vent.v_b, 2)} m/s`, ORIGINES[vent.origines.v_b0], o.v_bSource);

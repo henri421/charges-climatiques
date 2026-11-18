@@ -47,6 +47,32 @@
       <section id="saisie" aria-label="input of the building and the site">
         <form id="formulaire" autocomplete="off">
           <fieldset>
+            <legend>National Annex and factors</legend>
+            <label><span>National Annex</span>
+              <select data-champ="annexe"></select>
+            </label>
+            <p class="avertissement" data-role="bandeau-annexe" hidden></p>
+            <label><span>c<sub>dir</sub> (-), §4.2(2) Note 2</span><input type="text" inputmode="decimal" data-champ="coef_c_dir" /></label>
+            <label><span>c<sub>season</sub> (-), §4.2(2) Note 3</span><input type="text" inputmode="decimal" data-champ="coef_c_season" /></label>
+            <label><span>&rho; (kg/m&sup3;), §4.5(1) Note 2</span><input type="text" inputmode="decimal" data-champ="coef_rho" /></label>
+            <label><span>k<sub>I</sub> (-), §4.4(1) Note 2</span><input type="text" inputmode="decimal" data-champ="coef_k_I" /></label>
+            <label><span>c<sub>pi</sub> positive envelope, §7.2.9(6) Note 2</span><input type="text" inputmode="decimal" data-champ="coef_c_pi_positif" /></label>
+            <label><span>c<sub>pi</sub> negative envelope, §7.2.9(6) Note 2</span><input type="text" inputmode="decimal" data-champ="coef_c_pi_negatif" /></label>
+            <label><span>C<sub>e</sub> windswept site, Table 5.1</span><input type="text" inputmode="decimal" data-champ="coef_C_e_battu" /></label>
+            <label><span>C<sub>e</sub> normal site, Table 5.1</span><input type="text" inputmode="decimal" data-champ="coef_C_e_normal" /></label>
+            <label><span>C<sub>e</sub> sheltered site, Table 5.1</span><input type="text" inputmode="decimal" data-champ="coef_C_e_abrite" /></label>
+            <label><span>C<sub>t</sub> (-), §5.2(8)</span><input type="text" inputmode="decimal" data-champ="coef_C_t" /></label>
+            <label><span>&gamma; drifts (kN/m&sup3;), §5.3.6(1) and §6.2(2)</span><input type="text" inputmode="decimal" data-champ="coef_gamma_accumulation" /></label>
+            <label><span>&gamma; overhang (kN/m&sup3;), §6.3(2)</span><input type="text" inputmode="decimal" data-champ="coef_gamma_debord" /></label>
+            <label><span>&mu;<sub>2</sub> minimum, §6.2(2)</span><input type="text" inputmode="decimal" data-champ="coef_mu_obstacle_min" /></label>
+            <label><span>&mu;<sub>2</sub> maximum, §6.2(2)</span><input type="text" inputmode="decimal" data-champ="coef_mu_obstacle_max" /></label>
+            <label><span>&mu;<sub>w</sub> minimum, §5.3.6(1) Note 1</span><input type="text" inputmode="decimal" data-champ="coef_mu_w_min" /></label>
+            <label><span>&mu;<sub>w</sub> maximum, §5.3.6(1) Note 1</span><input type="text" inputmode="decimal" data-champ="coef_mu_w_max" /></label>
+            <label><span>l<sub>s</sub> minimum (m), §5.3.6(1) Note 2 and §6.2(2)</span><input type="text" inputmode="decimal" data-champ="coef_l_s_min" /></label>
+            <label><span>l<sub>s</sub> maximum (m), §5.3.6(1) Note 2 and §6.2(2)</span><input type="text" inputmode="decimal" data-champ="coef_l_s_max" /></label>
+          </fieldset>
+
+          <fieldset>
             <legend>Building</legend>
             <label><span>Length, along x (m)</span><input type="text" inputmode="decimal" data-champ="longueur" /></label>
             <label><span>Width, along y (m)</span><input type="text" inputmode="decimal" data-champ="largeur" /></label>

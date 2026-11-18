@@ -11,7 +11,7 @@
  * `phrase()` AU MOMENT DU RENDU, apres `definirLangue` (main.ts).
  */
 
-import { langueCourante, traducteur } from 'aedificium-ui';
+import { langueCourante, traduireSource, traducteur } from 'aedificium-ui';
 
 const FR = {
   origines: { profil: 'profil', saisi: 'saisie', 'defaut-recommande': 'défaut' } as Record<string, string>,
@@ -108,7 +108,7 @@ const FR = {
       'Bandes intermédiaires de la face au vent de hauteur au plus b, à z_e = leur sommet.',
       'Zonage au vent des toitures inclinées non traité dans cette version.',
       'Neige : situations durables et transitoires ; neige exceptionnelle hors périmètre.',
-      "Valeurs recommandées de l'Eurocode, sauf grandeurs de base saisies ; aucune annexe nationale codée.",
+      'Coefficients du profil choisi (valeurs recommandées ou annexe luxembourgeoise), sauf grandeurs de base saisies ; leurs valeurs et leurs sources figurent dans la note.',
     ],
     avertissementProfil:
       "Les actions climatiques dépendent de l'annexe nationale en vigueur au lieu de construction : " +
@@ -116,6 +116,30 @@ const FR = {
     batiment: (l: string, b: string, h: string): string => `Bâtiment ${l} x ${b} x ${h} m`,
     profil: (nom: string, date: string, perimetre: string): string => `Profil normatif : ${nom}, données consultées le ${date}. ${perimetre}`,
     provenance: 'Provenance des grandeurs de base',
+  },
+  annexe: {
+    coefficients: 'Coefficients de l’annexe',
+    libelles: {
+      c_dir: 'coefficient de direction',
+      c_season: 'coefficient de saison',
+      rho: "masse volumique de l'air",
+      k_I: 'coefficient de turbulence',
+      c_pi_positif: 'pression intérieure, enveloppe positive',
+      c_pi_negatif: 'pression intérieure, enveloppe négative',
+      C_e_battu: "coefficient d'exposition, site battu",
+      C_e_normal: "coefficient d'exposition, site normal",
+      C_e_abrite: "coefficient d'exposition, site abrité",
+      C_t: 'coefficient thermique',
+      gamma_accumulation: 'poids volumique de la neige, accumulations (kN/m3)',
+      gamma_debord: 'poids volumique de la neige, débord (kN/m3)',
+      mu_obstacle_min: 'coefficient de forme contre un obstacle, minimum',
+      mu_obstacle_max: 'coefficient de forme contre un obstacle, maximum',
+      mu_w_min: 'coefficient de forme dû au vent, minimum',
+      mu_w_max: 'coefficient de forme dû au vent, maximum',
+      l_s_min: "longueur d'accumulation, minimum (m)",
+      l_s_max: "longueur d'accumulation, maximum (m)",
+    } as Record<string, string>,
+    imposee: (valeur: string, source: string): string => `valeur imposée par l’utilisateur (annexe : ${valeur} ; ${source})`,
   },
   saisie: {
     libelles: {
@@ -250,7 +274,7 @@ const EN: Textes = {
       'Intermediate strips of the windward face at most b high, at z_e = their top.',
       'Wind zoning of pitched roofs not covered in this version.',
       'Snow: persistent and transient situations; exceptional snow out of scope.',
-      'Recommended values of the Eurocode, except the entered basic quantities; no National Annex coded.',
+      'Coefficients of the chosen profile (recommended values or Luxembourg annex), except the entered basic quantities; their values and sources are listed in the note.',
     ],
     avertissementProfil:
       'Climatic actions depend on the National Annex in force at the construction site: ' +
@@ -258,6 +282,30 @@ const EN: Textes = {
     batiment: (l, b, h) => `Building ${l} x ${b} x ${h} m`,
     profil: (nom, date, perimetre) => `Code profile: ${nom}, data checked on ${date}. ${perimetre}`,
     provenance: 'Origin of the basic quantities',
+  },
+  annexe: {
+    coefficients: 'Coefficients of the annex',
+    libelles: {
+      c_dir: 'directional factor',
+      c_season: 'season factor',
+      rho: 'air density',
+      k_I: 'turbulence factor',
+      c_pi_positif: 'internal pressure, positive envelope',
+      c_pi_negatif: 'internal pressure, negative envelope',
+      C_e_battu: 'exposure factor, windswept site',
+      C_e_normal: 'exposure factor, normal site',
+      C_e_abrite: 'exposure factor, sheltered site',
+      C_t: 'thermal factor',
+      gamma_accumulation: 'snow density, drifts (kN/m3)',
+      gamma_debord: 'snow density, overhang (kN/m3)',
+      mu_obstacle_min: 'shape factor against an obstruction, minimum',
+      mu_obstacle_max: 'shape factor against an obstruction, maximum',
+      mu_w_min: 'shape factor due to wind, minimum',
+      mu_w_max: 'shape factor due to wind, maximum',
+      l_s_min: 'drift length, minimum (m)',
+      l_s_max: 'drift length, maximum (m)',
+    } as Record<string, string>,
+    imposee: (valeur: string, source: string): string => `value imposed by the user (annex: ${valeur}; ${source})`,
   },
   saisie: {
     libelles: {
@@ -299,6 +347,14 @@ export function textes(): Textes {
   return langueCourante() === 'en' ? EN : FR;
 }
 
+/**
+ * Source d'une grandeur telle qu'elle s'affiche : phrase du noyau, puis source de
+ * l'annexe (LU) traduite en anglais. En francais, elle sort intacte.
+ */
+export function sourceAffichee(source: string): string {
+  return traduireSource(phrase(source));
+}
+
 /** Nom d'une grandeur dans les messages d'erreur du noyau. */
 const GRANDEURS: Record<string, string> = {
   'La différence de hauteur h avec la construction plus haute': 'The difference in height h with the higher construction work',
@@ -338,6 +394,9 @@ const face = (t: string): string => t.replace(/long pan/g, 'long side').replace(
 
 const EXACTES: Record<string, string> = {
   'Eurocode 1, valeurs recommandées': 'Eurocode 1, recommended values',
+  'Eurocode 1, Luxembourg (ILNAS AN-LU:2020, valeurs présumées)': 'Eurocode 1, Luxembourg (ILNAS AN-LU:2020, presumed values)',
+  'Annexe nationale luxembourgeoise AN-LU:2020 : valeurs recommandées présumées retenues, non vérifiées sur le texte de l’ILNAS. Ni s_k ni v_b,0 : ces grandeurs se saisissent.':
+    'Luxembourg National Annex AN-LU:2020: recommended values presumed retained, not checked against the ILNAS text. Neither s_k nor v_b,0: these quantities are entered.',
   "Valeurs recommandées de l'EN 1991-1-3 et de l'EN 1991-1-4, sans annexe nationale. Ni s_k ni v_b,0 : ces grandeurs se saisissent.":
     'Recommended values of EN 1991-1-3 and EN 1991-1-4, without National Annex. Neither s_k nor v_b,0: these quantities are entered.',
   "saisie de l'utilisateur, justification hors outil": 'entered by the user, justification outside the tool',
