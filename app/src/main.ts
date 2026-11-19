@@ -15,7 +15,7 @@ import {
   definirLangue,
   langueDuDocument,
   lireAnnexe,
-  noteDeCalculHtml,
+  noteDeCalculHtml, telechargerNotePdf,
   notationHtml,
   notationTexte,
   optionsAnnexe,
@@ -337,16 +337,16 @@ document.addEventListener('click', (evenement) => {
       JSON.stringify(exporterActions({ nom: e.profil.nom, date: e.profil.date }, e.neige, e.vent), null, 2),
       'application/json;charset=utf-8'
     );
-  } else if (action === 'exporter-note') {
-    const html = noteDeCalculHtml(
-      noteDuCalcul(e.profil, e.modele, e.vent, e.neige, {
-        projet: champsCartouche.projet.value,
-        element: champsCartouche.element.value,
-        date: new Date().toISOString().slice(0, 10),
-      }),
-      STYLES_TRACE
-    );
-    ouvrirOuTelecharger('charges-climatiques-note.html', html);
+  } else if (action === 'exporter-note' || action === 'exporter-note-pdf') {
+    const pdf = action === 'exporter-note-pdf';
+    const noteCalc = noteDuCalcul(e.profil, e.modele, e.vent, e.neige, {
+      projet: champsCartouche.projet.value,
+      element: champsCartouche.element.value,
+      date: new Date().toISOString().slice(0, 10),
+    });
+    // PDF construit au clic ; en cas d'echec, la note HTML prend le relais.
+    if (pdf) void telechargerNotePdf('charges-climatiques-note.pdf', noteCalc, STYLES_TRACE).catch(() => ouvrirOuTelecharger('charges-climatiques-note.html', noteDeCalculHtml(noteCalc, STYLES_TRACE)));
+    else ouvrirOuTelecharger('charges-climatiques-note.html', noteDeCalculHtml(noteCalc, STYLES_TRACE));
   }
 });
 
